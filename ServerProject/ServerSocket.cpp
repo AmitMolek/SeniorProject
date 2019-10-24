@@ -1,3 +1,11 @@
+/*
+TODO:
+	- Create two sockets for each client that connects (one for instruction, one for data transfer)
+	- Test the two sockets configuration
+	- Code the instruction handler function so it listens for instructions
+	  and creates a new thread for the file transfer
+*/
+
 #include "ServerSocket.h"
 
 #include <WinSock2.h>
@@ -8,6 +16,7 @@
 #include <fstream>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
+#include <atomic>
 
 namespace fs = std::experimental::filesystem;
 
@@ -91,6 +100,113 @@ void* get_in_addr(struct sockaddr* sa) {
 	return &(((struct sockaddr_in6*)sa)->sin6_addr);
 }
 
+class FileTransferFlags {
+public:
+	atomic_bool cancellationToken;
+	atomic_bool isTransferCanceled;
+	atomic_bool isTransferFinished;
+
+	FileTransferFlags() {
+		cancellationToken = false;
+		isTransferCanceled = false;
+		isTransferFinished = false;
+	}
+
+};
+
+class FileTransferInfo {
+public:
+	atomic_int fileSize;
+	atomic<string> fileExtension;
+
+	FileTransferInfo(int _fileSize, string _fileExtension) {
+		fileSize = _fileSize;
+		fileExtension = _fileExtension;
+	}
+};
+
+class PathData {
+public:
+	fs::path projectPath;
+	fs::path storageFolderPath;
+
+	PathData() {
+		projectPath = fs::current_path();
+
+		storageFolderPath = projectPath;
+		storageFolderPath /= "Storage";
+
+		fs::create_directories(storageFolderPath);
+	}
+};
+
+void ClientInstructionHandler(SOCKET& instructionSocket, SOCKET& dataSocket, struct sockaddr_storage conInfo){
+	// Handle the instructions sent from the client here
+	std::thread::id threadId = std::this_thread::get_id();
+	char clientAddress[INET6_ADDRSTRLEN];
+
+	const int bufferSize = 1024;
+	char msgBuffer[bufferSize + 1];
+	int receivedBytes = 0;
+
+	ostringstream threadIdStream;
+	threadIdStream << std::this_thread::get_id();
+	string threadIdStr = threadIdStream.str();
+	string threadPrefix = "[THREAD " + threadIdStr + "] ";
+
+	inet_ntop(conInfo.ss_family, get_in_addr((struct sockaddr*) & conInfo), clientAddress, sizeof(clientAddress));
+
+	cout << threadPrefix << "Started listening for instructions from " << clientAddress << "\n";
+
+	while ((receivedBytes = recv(instructionSocket, msgBuffer, bufferSize, 0)) != -1){
+		cout << "Echoing msg from client: " << msgBuffer << "\n";
+	}
+}
+
+void FileUpload_Test(SOCKET& dataSocket, const FileTransferInfo& fileInfo, const FileTransferFlags& flags){
+	const int bufferSize = 1024;
+	char msgBuffer[bufferSize];
+	int receivedBytes = -1;
+
+	ostringstream threadIdStream;
+	threadIdStream << std::this_thread::get_id();
+	string threadIdStr = threadIdStream.str();
+	string threadPrefix = "[THREAD " + threadIdStr + " |FILE] ";
+
+	PathData paths;
+	fs::path threadStorageFolder = paths.storageFolderPath;
+	threadStorageFolder /= threadIdStr;
+	fs::create_directories(threadStorageFolder);
+
+	fs::path outputFilePath = threadStorageFolder;
+	string fileNamePath = "tmp_" + threadIdStr + fileInfo.fileExtension.load();
+	outputFilePath /= fileNamePath;
+
+	ofstream outputFile(outputFilePath, std::ios::binary);
+
+	while ((receivedBytes = recv(dataSocket, msgBuffer, bufferSize, 0)) != -1) {
+		if (flags.cancellationToken) {
+			outputFile.close();
+			fs::remove(outputFilePath);
+			cout << threadPrefix << "File transfer " << fileNamePath << " canceled\n";
+			break;
+		}
+
+		// Handle the received bytes here (create a file, write to it and that shit...)
+		outputFile.write(msgBuffer, bufferSize);
+		memset(msgBuffer, 0, sizeof(char) * bufferSize);
+
+		if (flags.isTransferCanceled || flags.isTransferFinished) {
+			outputFile.close();
+			cout << threadPrefix << "Closed file " << fileNamePath << "\n";
+			if (flags.isTransferCanceled) {
+				fs::remove(outputFilePath);
+				cout << threadPrefix << "Deleted file " << fileNamePath << "\n";
+			}
+		}
+	}
+}
+
 // File receive msg: FILE=file size, file extension
 // File end msg: FILE_END
 void TestThreadFunc(SOCKET&& clientSocket, struct sockaddr_storage conInfo) {
@@ -117,7 +233,7 @@ void TestThreadFunc(SOCKET&& clientSocket, struct sockaddr_storage conInfo) {
 
 	cout << threadPrefix << "New client " << clientAddress << '\n';
 
-	while ((receivedBytes = recv(clientSocket, buffer, bufferSize, 0) != -1)){
+	while ((receivedBytes = recv(clientSocket, buffer, bufferSize, 0)) != -1){
 		string rMsg(buffer);
 		vector<string> splittedMsg;
 		vector<string> filePieces;
@@ -169,6 +285,12 @@ void TestThreadFunc(SOCKET&& clientSocket, struct sockaddr_storage conInfo) {
 	}
 
 	cout << threadPrefix << "Stopped receiving from " << clientAddress << '\n';
+}
+
+void ServerSocket::AcceptTwoSocketsConnections() {
+	SOCKET clientInstructionSocket = INVALID_SOCKET;
+	SOCKET clientDataSocket = INVALID_SOCKET;
+	
 }
 
 void ServerSocket::AcceptConnections() {

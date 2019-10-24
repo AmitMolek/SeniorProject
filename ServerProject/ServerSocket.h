@@ -11,6 +11,7 @@ public:
 	void ListenToSocket();
 	void AcceptSingleConnection();
 	void AcceptConnections();
+	void AcceptTwoSocketsConnections();
 
 	void FillHints();
 	void Disconnect();
