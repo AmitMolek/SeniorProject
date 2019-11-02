@@ -8,7 +8,7 @@ int main() {
 	ServerSocket::InitWinsock();
 	ServerSocket serverSocket(NULL, "23456");
 	//ConnectionThread test(nullptr);
-	//
+	//fdsfdsasd
 	//vector<tuple<ConnectionThread, std::thread>> clientThreads;
 	//
 	//clientThreads.push_back({test, test.StartConnection()});
