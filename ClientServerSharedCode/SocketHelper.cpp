@@ -37,12 +37,14 @@ void SocketHelper::GetSocket(struct addrinfo* result, SOCKET& outputSocket) {
 }
 
 bool SocketHelper::SendMsg(SOCKET socket, string msg, const int bufferSize) {
-	int receivedSent = -1;
-	
-	if ((receivedSent = send(socket, msg.c_str(), bufferSize, 0)) != -1)
-		return false;
-
-	return true;
+	//int receivedBytes = -1;
+	//char buffer[1024];
+	//
+	//if ((receivedBytes = recv(socket, buffer, bufferSize, 0)) != -1)
+	//	return false;
+	//
+	//return true;
+	while (true);
 }
 
 void SocketHelper::InitWinSock() {

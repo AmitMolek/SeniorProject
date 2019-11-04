@@ -71,5 +71,6 @@ int main(){
 	//testReadFile();
 
 	SocketHelper::InitWinSock();
-	BaseClient bc{"10.0.0.29", "23456", "23457"};
+	//BaseClient bc{"10.0.0.29", "23456", "23457"};
+	BaseClient bc{ "10.10.1.3", "23456", "23457" };
 }
