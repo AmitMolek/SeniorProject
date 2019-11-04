@@ -4,8 +4,10 @@
 class BaseServer {
 public:
 	struct addrinfo* instructionResult;
+	struct addrinfo* dataResult;
 
 	SOCKET instructionSocket;
+	SOCKET dataSocket;
 
 	PCSTR dataPort;
 	PCSTR instructionPort;

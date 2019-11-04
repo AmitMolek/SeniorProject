@@ -18,8 +18,11 @@ public:
 
 	void GetDataAddressInfo();
 	void GetInstructionAddressInfo();
+
 	void GetDataSocket();
 	void GetInstructionSocket();
+
 	void ConnectInstructionSocket();
+	void ConnectDataSocket();
 };
 
