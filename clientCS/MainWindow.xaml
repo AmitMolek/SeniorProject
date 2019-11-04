@@ -24,8 +24,8 @@
         <Label x:Name="label" Content="status:" HorizontalAlignment="Left" Height="31" Margin="400,90,0,0" VerticalAlignment="Top" Width="55"/>
         <Label x:Name="lblConnectionStatus" Content="disconnected" HorizontalAlignment="Left" Margin="460,93,0,0" VerticalAlignment="Top"/>
         <Button x:Name="btnBrowse" Content="Browse" HorizontalAlignment="Left" Margin="400,37,0,0" VerticalAlignment="Top" Grid.Row="1" />
-        <TextBox x:Name="txtPath" HorizontalAlignment="Left" Height="20" Margin="138,37,0,0" Text="TextBox" TextWrapping="Wrap" VerticalAlignment="Top" Width="247" Grid.Row="1"/>
-        <Button x:Name="btnUpload" Content="Upload" HorizontalAlignment="Left" Margin="219,75,0,0" VerticalAlignment="Top" Grid.Row="1" />
+        <TextBox x:Name="txtPath" HorizontalAlignment="Left" Height="20" Margin="138,37,0,0" Text="TextBox" TextWrapping="Wrap" VerticalAlignment="Top" Width="247" Grid.Row="1" AllowDrop="True" PreviewDragLeave="TextBox_Leave" PreviewDragEnter="TextBox_DragEnter" PreviewDragOver="TextBox_DragEnter" PreviewDrop="TextBox_Drop"/>
+        <Button x:Name="btnUpload" Content="Upload" HorizontalAlignment="Left" Margin="219,75,0,0" VerticalAlignment="Top" Grid.Row="1" Click="btnSendFile_Click"/>
 
     </Grid>
 </Window>
