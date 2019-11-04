@@ -19,14 +19,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BaseServer.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="ServerSocket.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ConnectionInfo.h" />
-    <ClInclude Include="ConnectionThread.h" />
+    <ClInclude Include="BaseServer.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="ServerSocket.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ServerProject.rc" />

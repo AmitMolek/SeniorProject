@@ -3,7 +3,9 @@
 
 #include <filesystem>
 
-#include "ClientSocket.h"
+//#include "ClientSocket.h"
+#include "BaseClient.h"
+#include "SocketHelper.h"
 
 using namespace std;
 namespace fs = std::filesystem;
@@ -62,9 +64,12 @@ void testReadFile() {
 }
 
 int main(){
-	ClientSocket::InitWinsock();
+	//ClientSocket::InitWinsock();
 	//ClientSocket cs("10.0.0.100");
-	ClientSocket cs;
-
+	//ClientSocket cs;
+	
 	//testReadFile();
+
+	SocketHelper::InitWinSock();
+	BaseClient bc{"10.0.0.29", "23456", "23457"};
 }

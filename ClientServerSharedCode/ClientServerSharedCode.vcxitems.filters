@@ -4,15 +4,24 @@
     <Filter Include="Socket">
       <UniqueIdentifier>{a080d5db-31e0-4952-8cc7-cbb627787ba2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DataStructure">
+      <UniqueIdentifier>{6ba6fd7d-1470-412b-a8f6-f8fd438b73e3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="$(MSBuildThisFileDirectory)BasicSocket.cpp">
+    <ClCompile Include="$(MSBuildThisFileDirectory)SocketHelper.cpp">
       <Filter>Socket</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)SocketVector.cpp">
+      <Filter>DataStructure</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="$(MSBuildThisFileDirectory)BasicSocket.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)SocketHelper.h">
       <Filter>Socket</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)SocketVector.h">
+      <Filter>DataStructure</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
