@@ -8,6 +8,8 @@ using namespace std;
 
 #pragma comment(lib, "Ws2_32.lib")
 
+#define CONST_BUFFER_SIZE 1024
+
 struct addrinfo* SocketHelper::GetAddressInfo(PCSTR serverAddress, PCSTR connectionPort, 
 	struct addrinfo hints) {
 	int returnCode = -1;
@@ -36,7 +38,30 @@ void SocketHelper::GetSocket(struct addrinfo* result, SOCKET& outputSocket) {
 	}
 }
 
-bool SocketHelper::SendMsg(SOCKET socket, string msg, const int bufferSize) {
+template<typename F>
+bool SocketHelper::SendAll(const SOCKET& socket, char* buffer, int length, F action){
+	int totalSent = 0;
+	int bytesLeft = length;
+	int n;
+
+	while(totalSent < length){
+		n = send(socket, buffer + totalSent, bytesLeft, 0);
+		if (n == -1)
+			break;
+		totalSent += n;
+		bytesLeft -= n;
+
+		action();
+	}
+
+	return (n == -1) ? false : true;
+}
+
+bool SocketHelper::SendAll(const SOCKET& socket, char* buffer, int length) {
+	return SendAll(socket, buffer, length, []() {});
+}
+
+bool SocketHelper::SendMsg(SOCKET& socket, string msg, const int bufferSize) {
 	//int receivedBytes = -1;
 	//char buffer[1024];
 	//
