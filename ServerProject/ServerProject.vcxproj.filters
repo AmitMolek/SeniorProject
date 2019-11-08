@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\Log">
+      <UniqueIdentifier>{58773393-1e81-401e-a3e9-ad77935fe722}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Log">
+      <UniqueIdentifier>{ce2d937b-d43f-4f1e-8a5e-679d38573bb8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -21,6 +27,9 @@
     <ClCompile Include="BaseServer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ConsoleOutput.cpp">
+      <Filter>Source Files\Log</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -28,6 +37,9 @@
     </ClInclude>
     <ClInclude Include="BaseServer.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ConsoleOutput.h">
+      <Filter>Header Files\Log</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

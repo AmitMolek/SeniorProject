@@ -1,5 +1,6 @@
 #include "BaseServer.h"
 #include "SocketHelper.h"
+#include "ConsoleOutput.h"
 
 #include <iostream>
 #include <WinSock2.h>
@@ -15,10 +16,12 @@
 using namespace std;
 
 #define BUFFER_SIZE 1024
-#define DATA_SOCKET_TIMEOUT 15
+#define DATA_SOCKET_TIMEOUT 5
 
-void Thread_HandleClientInstructions(SOCKET&& clientSocket, SOCKET&& dataSocket, struct sockaddr_storage clientAddr);
+void Thread_HandleClientInstructions(SOCKET&& clientSocket, SOCKET&& dataSocket, string clientAddr);
 void* get_in_addr(struct sockaddr* sa);
+
+void Thread_Accept(SOCKET _socket, string socketPrefix, bool spawnThread);
 
 BaseServer::BaseServer(PCSTR _dataPort, PCSTR _instructionPort) {
 	instructionSocket = INVALID_SOCKET;
@@ -40,7 +43,11 @@ void BaseServer::StartServer() {
 	BindDataPort();
 	ListenDataSocket();
 
-	StartAccepting();
+	//StartAccepting();
+	std::thread instructionAcceptThread (Thread_Accept, instructionSocket, "instruction", true);
+	std::thread dataAcceptThread(Thread_Accept, dataSocket, "data", false);
+	instructionAcceptThread.join();
+	dataAcceptThread.join();
 }
 
 void BaseServer::StartAccepting() {
@@ -51,15 +58,27 @@ void BaseServer::StartAccepting() {
 	socklen_t clientDataAddrSize = sizeof(clientAddrData);
 
 	char clientAddress[INET6_ADDRSTRLEN];
-
-	bool canGetDataSocket = true;
+	string sendMsg;
 
 	cout << "[INFO] Started accepting clients\n";
 
 	while (true){
+		clientInstructionSocket = INVALID_SOCKET;
+		clientDataSocket = INVALID_SOCKET;
+
 		clientInstructionSocket = 
 			accept(instructionSocket, (struct sockaddr*) &clientAddrInstruction, &clientInstructionAddrSize);
 
+		// Checking if the instruction socket is valid
+		if (clientInstructionSocket == INVALID_SOCKET) {
+			cerr << "[ERROR] Failed to connect to client\n";
+			continue;
+		}
+		cout << "Instruction Socket = " << clientInstructionSocket << "\n";
+		sendMsg = "pass:instruction_socket:" + std::to_string(clientInstructionSocket);
+		send(clientInstructionSocket, sendMsg.c_str(), sendMsg.size(), 0);
+
+		// Getting the client address so we can print it
 		inet_ntop(
 			clientAddrInstruction.ss_family,
 			get_in_addr((struct sockaddr*) & clientAddrInstruction),
@@ -68,40 +87,69 @@ void BaseServer::StartAccepting() {
 
 		cout << "[INFO] Waiting for data socket connection from " << clientAddress << "\n";
 
-		auto acceptDataSocket = std::async(
-			launch::async, 
-			[](SOCKET _dataSocket, struct sockaddr_storage clientAddr, socklen_t clientAddrSize){
-			return accept(_dataSocket, (struct sockaddr*) &clientAddr, &clientAddrSize);
-		}, dataSocket, clientAddrData, clientDataAddrSize);
+		// Lambda for checking for connection to the data socket
+		auto checkForDataConnection = [](SOCKET _dataSocket, struct sockaddr_storage clientAddr, socklen_t clientAddrSize, string clientStrAddress, bool* cts) {
+			std::chrono::milliseconds sleepFor(50);
 
-		std::chrono::seconds timeoutSpan(DATA_SOCKET_TIMEOUT);
-		while (acceptDataSocket.wait_for(timeoutSpan) == std::future_status::timeout) {
-			cout << "[INFO] Data socket connection timed-out for " << clientAddress << "\n";
-			char errMsg[] = "timeout:data_socket";
-			send(clientInstructionSocket, errMsg, sizeof(errMsg), 0);
-			closesocket(clientInstructionSocket);
-			clientInstructionSocket = INVALID_SOCKET;
-			canGetDataSocket = false;
-			break;
+			// Setting the _dataSocket to be unblocking so we can poll and check for cancellation
+			u_long socketUnblockMode = 1;
+			ioctlsocket(_dataSocket, FIONBIO, &socketUnblockMode);
+
+			SOCKET clientDataSocket = INVALID_SOCKET;
+			do {
+				// Just to slow down the polling
+				std::this_thread::sleep_for(sleepFor);
+
+				// Checking if this operation is being cancelled
+				if (*cts) {
+					cout << "[INFO] Stopped waiting for data socket from " << clientStrAddress << "\n";
+					break;
+				}
+				cout << "[LOOK HERE] before: " << clientDataSocket << "\n";
+				clientDataSocket = accept(_dataSocket, (struct sockaddr*) & clientAddr, &clientAddrSize);
+				cout << "[LOOK HERE] after: " << clientDataSocket << "\n";
+			} while (clientDataSocket == INVALID_SOCKET);
+			ConsoleOutput() << "[BITCH] Background socket listening ended\n";
+			return clientDataSocket;
+		};
+
+		// cts = CancellationTokenSource, used to cancel the async operation
+		bool cts = false;
+		// Starting async operationfor connecting the data socket of this client
+		auto acceptDataSocket = std::async(launch::async, checkForDataConnection, dataSocket, clientAddrData, clientDataAddrSize, clientAddress, &cts);
+
+		// if acceptDataSocket is taking to long we cancel the operation
+		std::chrono::seconds dataSocketTimeoutSpan(DATA_SOCKET_TIMEOUT);
+		while (acceptDataSocket.wait_for(dataSocketTimeoutSpan) == std::future_status::timeout) {
+			cout << "TIMEOUT BITCH\n";
+			cts = true;
 		}
 
-		if (canGetDataSocket)
-			clientDataSocket = acceptDataSocket.get();
-
-		if (clientInstructionSocket == INVALID_SOCKET) {
-			cerr << "[ERROR] Failed to connect to client\n";
+		if (cts) {
+			sendMsg = "fail:data_socket_timeout";
+			send(clientInstructionSocket, sendMsg.c_str(), sendMsg.size(), 0);
 			continue;
 		}
 
-		char successMsg[] = "success:connection";
-		send(clientInstructionSocket, successMsg, sizeof(successMsg), 0);
+		try {
+			clientDataSocket = acceptDataSocket.get();
+			if (clientDataSocket == INVALID_SOCKET) {
+				sendMsg = "fail:data_socket_invalid";
+				send(clientInstructionSocket, sendMsg.c_str(), sendMsg.size(), 0);
+			} else {
+				std::thread clientThread(
+					Thread_HandleClientInstructions,
+					clientInstructionSocket,
+					clientDataSocket,
+					clientAddress);
+				clientThread.detach();
+			}
+		} catch (std::exception& e) {
+			sendMsg = "fail:data_socket_accept";
+			send(clientInstructionSocket, sendMsg.c_str(), sendMsg.size(), 0);
+		}
 
-		std::thread clientThread(
-			Thread_HandleClientInstructions,
-			clientInstructionSocket,
-			clientDataSocket,
-			clientAddrInstruction);
-		clientThread.detach();
+		cts = true;
 	}
 
 }
@@ -194,16 +242,19 @@ void* get_in_addr(struct sockaddr* sa) {
 void Thread_HandleClientInstructions(
 	SOCKET&& instructionSocket, 
 	SOCKET&& dataSocket,
-	struct sockaddr_storage clientAddr){
-	char clientAddress[INET6_ADDRSTRLEN];
+	string clientAddress){
+
+	string msgToClient;
 	char msgBuffer[BUFFER_SIZE];
 
 	int recievedBytes = -1;
 
-	inet_ntop(clientAddr.ss_family, get_in_addr((struct sockaddr*)&clientAddr), clientAddress, sizeof(clientAddress));
+	msgToClient = "pass:connected";
+	send(instructionSocket, msgToClient.c_str(), msgToClient.size(), 0);
 
 	cout << "[INFO] Client connected [" << clientAddress << "]\n";
-	while (true);
+
+	// Waiting for instructions
 	while ((recievedBytes = recv(instructionSocket, msgBuffer, BUFFER_SIZE, 0)) != -1){
 		string msgBuffer;
 		vector<string> splittedMsg;
@@ -224,5 +275,79 @@ void Thread_HandleClientInstructions(
 		}
 	}
 
-	cout << "[INFO] Client disconnected [" << clientAddress << "]\n";
+	ConsoleOutput() << "[INFO] Client disconnected [" << clientAddress << "]\n";
+	//cout << "[INFO] Client disconnected [" << clientAddress << "]\n";
+}
+
+void Thread_HandleClient(SOCKET instructionSocket, string clientAddress){
+	char msgBuffer[BUFFER_SIZE];
+
+	int recievedBytes = -1;
+
+	SOCKET dataSocket = INVALID_SOCKET;
+
+	string clientPrefix = "[" + clientAddress + "]";
+	string msgToSend;
+
+	ConsoleOutput() << "[INFO]" << clientPrefix << " Started handling client\n";
+
+	// Keep listrning for instructions from the client
+	while ((recievedBytes = recv(instructionSocket, msgBuffer, BUFFER_SIZE, 0)) != -1){
+		vector<string> splittedMsg;
+		string msgBuffer(msgBuffer, msgBuffer + recievedBytes);
+		ConsoleOutput() << "[INFO]" << clientPrefix << " Sent instruction: " << msgBuffer << "\n";
+
+		boost::split(splittedMsg, msgBuffer, boost::is_any_of("|"));
+		for(string inst : splittedMsg){
+			vector<string> splittedInstructions;
+			boost::split(splittedInstructions, inst, boost::is_any_of(":"));
+			if (splittedInstructions.size() > 0) {
+				if (splittedInstructions[0] == "pass") {
+					if (splittedInstructions[1] == "data_socket_id") {
+						// pass:data_socket_id:FD -> Client sending the server the data socket FD (File Descriptor)
+						dataSocket = stoi(splittedInstructions[2]);
+						ConsoleOutput() << "[INFO]" << clientPrefix << " Got data socket " << dataSocket << "\n";
+
+						msgToSend = "|pass:socket_id";
+						send(instructionSocket, msgToSend.c_str(), msgToSend.size(), 0);
+					}
+				}
+			}
+		}
+	}
+
+	ConsoleOutput() << "[INFO] Client [" << clientAddress << "] lost connection\n";
+}
+
+void Thread_Accept(SOCKET _socket, string socketPrefix, bool spawnThread = false) {
+	SOCKET clientSocket = INVALID_SOCKET;
+
+	struct sockaddr_storage clientAddr;
+	socklen_t clientAddrSize = sizeof(clientAddr);
+
+	char clientAddress[INET6_ADDRSTRLEN];
+	string sendMsg;
+
+	ConsoleOutput() << "[INFO] Start accepting clients on the " << socketPrefix << " socket\n";
+
+	while (true) {
+		clientSocket = INVALID_SOCKET;
+
+		clientSocket = accept(_socket, (struct sockaddr*) &clientAddr, &clientAddrSize);
+
+		if (clientSocket == INVALID_SOCKET)
+			continue;
+
+		inet_ntop(clientAddr.ss_family, get_in_addr((struct sockaddr*) &clientAddr), clientAddress, sizeof(clientAddress));
+
+		ConsoleOutput() << "[INFO] Accepted client [" << clientAddress << "] on the " << socketPrefix << " socket\n";
+
+		sendMsg = "|pass:" + socketPrefix + "_socket:" + std::to_string(clientSocket);
+		send(clientSocket, sendMsg.c_str(), sendMsg.size(), 0);
+
+		if (spawnThread) {
+			std::thread clientThread(Thread_HandleClient, clientSocket, clientAddress);
+			clientThread.detach();
+		}
+	}
 }

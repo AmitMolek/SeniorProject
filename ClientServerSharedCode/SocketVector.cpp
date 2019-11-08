@@ -4,20 +4,8 @@
 #include <mutex>
 #include <vector>
 
-SocketVector::SocketVector() : pairs(), lock(){
+SocketVector::SocketVector() : sockets(), lock(){}
 
-}
-
-void SocketVector::AddPair(SOCKET& _instructionSocket, SOCKET& _dataSocket) {
-	lock.lock();
-	pairs.push_back({_instructionSocket, _dataSocket});
-	lock.unlock();
-}
-
-SocketPair& SocketVector::GetPair(SOCKET& _instructionSocket){
-	for (SocketPair& pair : pairs) {
-		if (pair.instructionSocket == _instructionSocket) {
-			return pair;
-		}
-	}
+bool SocketVector::AddSocket(SOCKET _socket){
+	return true;
 }
