@@ -14,10 +14,12 @@
     <ProjectCapability Include="SourceItemsFromImports" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)InstructionResolver.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)SocketHelper.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)SocketVector.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)InstructionResolver.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)SocketHelper.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)SocketVector.h" />
   </ItemGroup>

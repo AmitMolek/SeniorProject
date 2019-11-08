@@ -164,20 +164,20 @@ void Thread_HandleInstruction(SOCKET&& instructionSocket, SOCKET&& dataSocket, s
 							cout << "DATA MSG " << dataMsg << "\n";
 							if (splitInstructions[1] == "data_socket") {
 								dataSocketFd = splitInstructions[2];
+
+								cout << "Instruction Socket = " << instructionSocketFd << "\n";
+								cout << "Data Socket = " << dataSocketFd << "\n";
+
+								string dataSocketIdMsg = "|pass:data_socket_id:" + dataSocketFd;
+								send(instructionSocket, dataSocketIdMsg.c_str(), dataSocketIdMsg.size(), 0);
+
 								break;
 							}
 						}
-					}
-
-					cout << "Instruction Socket = " << instructionSocketFd << "\n";
-					cout << "Data Socket = " << dataSocketFd << "\n";
-
-					string dataSocketIdMsg = "|pass:data_socket_id:" + dataSocketFd;
-					send(instructionSocket, dataSocketIdMsg.c_str(), dataSocketIdMsg.size(), 0);
-
-					while ((receivedBytes = recv(dataSocket, instructionBuffer, INSTRUCTION_BUFFER_SIZE, 0)) != -1) {
-						string dataMsg(instructionBuffer, instructionBuffer + receivedBytes);
-						cout << "DATA MSG 2 " << dataMsg << "\n";
+					}else if (splitInstructions[1] == "socket_id"){
+						Sleep(2000);
+						string dataSocketIdMsg = "|pass:dick1:54,67,12,gay|pass:dick2";
+						send(instructionSocket, dataSocketIdMsg.c_str(), dataSocketIdMsg.size(), 0);
 					}
 				}
 			}
