@@ -1,6 +1,7 @@
 #include "BaseServer.h"
 #include "SocketHelper.h"
 #include "ConsoleOutput.h"
+#include "InstructionResolver.h"
 
 #include <iostream>
 #include <WinSock2.h>
@@ -295,22 +296,20 @@ void Thread_HandleClient(SOCKET instructionSocket, string clientAddress){
 	while ((recievedBytes = recv(instructionSocket, msgBuffer, BUFFER_SIZE, 0)) != -1){
 		vector<string> splittedMsg;
 		string msgBuffer(msgBuffer, msgBuffer + recievedBytes);
-		ConsoleOutput() << "[INFO]" << clientPrefix << " Sent instruction: " << msgBuffer << "\n";
+		ConsoleOutput() << "[INFO]" << clientPrefix << " Sent: " << msgBuffer << "\n";
 
-		boost::split(splittedMsg, msgBuffer, boost::is_any_of("|"));
-		for(string inst : splittedMsg){
-			vector<string> splittedInstructions;
-			boost::split(splittedInstructions, inst, boost::is_any_of(":"));
-			if (splittedInstructions.size() > 0) {
-				if (splittedInstructions[0] == "pass") {
-					if (splittedInstructions[1] == "data_socket_id") {
-						// pass:data_socket_id:FD -> Client sending the server the data socket FD (File Descriptor)
-						dataSocket = stoi(splittedInstructions[2]);
-						ConsoleOutput() << "[INFO]" << clientPrefix << " Got data socket " << dataSocket << "\n";
-
-						msgToSend = "|pass:socket_id";
-						send(instructionSocket, msgToSend.c_str(), msgToSend.size(), 0);
-					}
+		// Resolve the message for instructions
+		vector<Instruction> instructions = InstructionResolver::Resolve(msgBuffer);
+		for (Instruction inst : instructions) {
+			ConsoleOutput() << "[INFO]" << clientPrefix << " Instruction " << inst << "\n";
+		
+			if (inst.status == "pass") {
+				if (inst.code == "data_socket_id") {
+					dataSocket = stoi(inst.content[0]);
+					ConsoleOutput() << "[INFO]" << clientPrefix << " Got data socket " << dataSocket << "\n";
+		
+					msgToSend = "|pass:socket_id";
+					send(instructionSocket, msgToSend.c_str(), msgToSend.size(), 0);
 				}
 			}
 		}
