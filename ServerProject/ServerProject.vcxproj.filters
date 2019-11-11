@@ -19,6 +19,12 @@
     <Filter Include="Header Files\Log">
       <UniqueIdentifier>{ce2d937b-d43f-4f1e-8a5e-679d38573bb8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Protocol">
+      <UniqueIdentifier>{70dde126-c49e-4d5f-adfa-674ab7f5eb3b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Protocol">
+      <UniqueIdentifier>{eab0ef84-dccf-4fd7-b3d1-411cbcd9e710}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -30,6 +36,12 @@
     <ClCompile Include="ConsoleOutput.cpp">
       <Filter>Source Files\Log</Filter>
     </ClCompile>
+    <ClCompile Include="InstructionHandler.cpp">
+      <Filter>Source Files\Protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="CommunicationHandler.cpp">
+      <Filter>Source Files\Protocol</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -40,6 +52,12 @@
     </ClInclude>
     <ClInclude Include="ConsoleOutput.h">
       <Filter>Header Files\Log</Filter>
+    </ClInclude>
+    <ClInclude Include="InstructionHandler.h">
+      <Filter>Header Files\Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="CommunicationHandler.h">
+      <Filter>Header Files\Protocol</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

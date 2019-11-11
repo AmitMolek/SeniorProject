@@ -7,6 +7,9 @@
     <Filter Include="DataStructure">
       <UniqueIdentifier>{6ba6fd7d-1470-412b-a8f6-f8fd438b73e3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Exception">
+      <UniqueIdentifier>{6b7084ac-643a-4e20-9b35-93fd540180fe}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)SocketHelper.cpp">
@@ -16,6 +19,15 @@
       <Filter>DataStructure</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)InstructionResolver.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)SendFailedException.cpp">
+      <Filter>Exception</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)ConnectionInfo.cpp">
+      <Filter>DataStructure</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)FileUploadInfo.cpp">
+      <Filter>DataStructure</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)SocketHelper.h">
@@ -25,5 +37,14 @@
       <Filter>DataStructure</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)InstructionResolver.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)SendFailedException.h">
+      <Filter>Exception</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)ConnectionInfo.h">
+      <Filter>DataStructure</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)FileUploadInfo.h">
+      <Filter>DataStructure</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

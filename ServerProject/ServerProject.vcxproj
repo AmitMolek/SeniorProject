@@ -20,12 +20,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BaseServer.cpp" />
+    <ClCompile Include="CommunicationHandler.cpp" />
     <ClCompile Include="ConsoleOutput.cpp" />
+    <ClCompile Include="InstructionHandler.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseServer.h" />
+    <ClInclude Include="CommunicationHandler.h" />
     <ClInclude Include="ConsoleOutput.h" />
+    <ClInclude Include="InstructionHandler.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>

@@ -6,13 +6,14 @@
 
 class SocketHelper {
 public:
-	static struct addrinfo* GetAddressInfo(PCSTR serverAddress, PCSTR connectionPort, struct addrinfo hints);
-	static void GetSocket(struct addrinfo* result, SOCKET& outputSocket);
-	static bool SendMsg(SOCKET& socket, std::string msg, const int bufferSize);
 	static void InitWinSock();
 
+	static struct addrinfo* GetAddressInfo(PCSTR serverAddress, PCSTR connectionPort, struct addrinfo hints);
+	static void GetSocket(struct addrinfo* result, SOCKET& outputSocket);
+
 	template<typename F>
-	static bool SendAll(const SOCKET& socket, char* buffer, int length, F action);
-	static bool SendAll(const SOCKET& socket, char* buffer, int length);
+	static void SendAll(const SOCKET& socket, char* buffer, int length, F action) throw();
+	static void SendAll(const SOCKET& socket, char* buffer, int length) throw();
+	static void SendMsg(SOCKET& socket, std::string msg) throw();
 };
 
