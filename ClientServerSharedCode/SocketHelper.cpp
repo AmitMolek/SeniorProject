@@ -4,6 +4,8 @@
 #include <WinSock2.h>
 #include <WS2tcpip.h>
 
+#include "SendFailedException.h"
+
 using namespace std;
 
 #pragma comment(lib, "Ws2_32.lib")
@@ -39,10 +41,10 @@ void SocketHelper::GetSocket(struct addrinfo* result, SOCKET& outputSocket) {
 }
 
 template<typename F>
-bool SocketHelper::SendAll(const SOCKET& socket, char* buffer, int length, F action){
+void SocketHelper::SendAll(const SOCKET& socket, char* buffer, int length, F action){
 	int totalSent = 0;
 	int bytesLeft = length;
-	int n;
+	int n = -1;
 
 	while(totalSent < length){
 		n = send(socket, buffer + totalSent, bytesLeft, 0);
@@ -54,22 +56,21 @@ bool SocketHelper::SendAll(const SOCKET& socket, char* buffer, int length, F act
 		action();
 	}
 
-	return (n == -1) ? false : true;
+	if (n == -1)
+		throw SendFailedException();
 }
 
-bool SocketHelper::SendAll(const SOCKET& socket, char* buffer, int length) {
-	return SendAll(socket, buffer, length, []() {});
+void SocketHelper::SendAll(const SOCKET& socket, char* buffer, int length) {
+	SendAll(socket, buffer, length, []() {});
 }
 
-bool SocketHelper::SendMsg(SOCKET& socket, string msg, const int bufferSize) {
-	//int receivedBytes = -1;
-	//char buffer[1024];
-	//
-	//if ((receivedBytes = recv(socket, buffer, bufferSize, 0)) != -1)
-	//	return false;
-	//
-	//return true;
-	while (true);
+void SocketHelper::SendMsg(SOCKET& socket, string msg) {
+	int sentBytes = -1;
+
+	sentBytes = send(socket, msg.c_str(), msg.size(), 0);
+
+	if (sentBytes == SOCKET_ERROR)
+		throw SendFailedException();
 }
 
 void SocketHelper::InitWinSock() {

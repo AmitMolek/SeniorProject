@@ -14,6 +14,7 @@ public:
 
 	BaseServer(PCSTR _dataPort, PCSTR _instructionPort);
 
+private:
 	void CreateInstructionSocket();
 	void CreateDataSocket();
 
@@ -22,7 +23,8 @@ public:
 
 	void ListenDataSocket();
 	void ListenInstructionSocket();
-private:
+
+	void GetHints(struct addrinfo& hints);
 	void ListenToSocket(const SOCKET& socket);
 	void BindPort(SOCKET& socket, struct addrinfo* result);
 	void StartAccepting();
