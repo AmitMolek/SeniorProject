@@ -1,4 +1,4 @@
-﻿using System;
+﻿/*using System;
 using System.Net;
 using System.IO;
 using System.Text;
@@ -8,20 +8,20 @@ using System.Runtime.Remoting;
 using System.Threading;
 
 
-/*
+*//*
  * FTP Client library in C#
  * Author: Jaimon Mathew
  * mailto:jaimonmathew@rediffmail.com
  * http://www.csharphelp.com/archives/archive9.html
  * 
  * Addapted for use by Dan Glass 07/03/03
- */
+ *//*
 
 
-namespace WebCamService
+namespace client
 {
 
-    public class FtpClient
+    public class BaseClient1
     {
 
         public class FtpException : Exception
@@ -30,7 +30,7 @@ namespace WebCamService
             public FtpException(string message, Exception innerException) : base(message, innerException) { }
         }
 
-        private static int BUFFER_SIZE = 512;
+        private static int BUFFER_SIZE = 1024;
         private static Encoding ASCII = Encoding.ASCII;
 
         private bool verboseDebugging = false;
@@ -38,8 +38,7 @@ namespace WebCamService
         // defaults
         private string server = "localhost";
         private string remotePath = ".";
-        private string username = "anonymous";
-        private string password = "anonymous@anonymous.net";
+       
         private string message = null;
         private string result = null;
 
@@ -56,23 +55,17 @@ namespace WebCamService
 
         private int timeoutSeconds = 10;
 
-        /// <summary>
         /// Default contructor
-        /// </summary>
-        public FtpClient()
+      
+        public BaseClient1()
         {
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="server"></param>
-        /// <param name="username"></param>
-        /// <param name="password"></param>
-        public FtpClient(string server, string username, string password)
+
+        public BaseClient1(string server, string dataPort, string instructionPort)
         {
             this.server = server;
-            this.username = username;
-            this.password = password;
+            this.dataPort = dataPort;
+            this.instructionPort = instructionPort;
         }
         /// <summary>
         /// 
@@ -82,7 +75,7 @@ namespace WebCamService
         /// <param name="password"></param>
         /// <param name="timeoutSeconds"></param>
         /// <param name="port"></param>
-        public FtpClient(string server, string username, string password, int timeoutSeconds, int port)
+        public BaseClient1(string server, string username, string password, int timeoutSeconds, int port)
         {
             this.server = server;
             this.username = username;
@@ -236,7 +229,7 @@ namespace WebCamService
         {
             if (this.loggedin) this.Close();
 
-            Debug.WriteLine("Opening connection to " + this.server, "FtpClient");
+            Debug.WriteLine("Opening connection to " + this.server, "BaseClient1");
 
             IPAddress addr = null;
             IPEndPoint ep = null;
@@ -260,7 +253,7 @@ namespace WebCamService
 
             this.loggedin = true;
 
-            Debug.WriteLine("Connected to " + this.server, "FtpClient");
+            Debug.WriteLine("Connected to " + this.server, "BaseClient1");
 
             this.ChangeDir(this.remotePath);
         }
@@ -270,7 +263,7 @@ namespace WebCamService
         /// </summary>
         public void Close()
         {
-            Debug.WriteLine("Closing connection to " + this.server, "FtpClient");
+            Debug.WriteLine("Closing connection to " + this.server, "BaseClient1");
 
             if (this.clientSocket != null)
             {
@@ -401,7 +394,7 @@ namespace WebCamService
 
             this.BinaryMode = true;
 
-            Debug.WriteLine("Downloading file " + remFileName + " from " + server + "/" + remotePath, "FtpClient");
+            Debug.WriteLine("Downloading file " + remFileName + " from " + server + "/" + remotePath, "BaseClient1");
 
             if (locFileName.Equals(""))
             {
@@ -431,11 +424,11 @@ namespace WebCamService
                     {
                         //Server dosnt support resuming
                         offset = 0;
-                        Debug.WriteLine("Resuming not supported:" + result.Substring(4), "FtpClient");
+                        Debug.WriteLine("Resuming not supported:" + result.Substring(4), "BaseClient1");
                     }
                     else
                     {
-                        Debug.WriteLine("Resuming at offset " + offset, "FtpClient");
+                        Debug.WriteLine("Resuming at offset " + offset, "BaseClient1");
                         output.Seek(offset, SeekOrigin.Begin);
                     }
                 }
@@ -515,14 +508,14 @@ namespace WebCamService
             if (resume && input.Length < offset)
             {
                 // different file size
-                Debug.WriteLine("Overwriting " + fileName, "FtpClient");
+                Debug.WriteLine("Overwriting " + fileName, "BaseClient1");
                 offset = 0;
             }
             else if (resume && input.Length == offset)
             {
                 // file done
                 input.Close();
-                Debug.WriteLine("Skipping completed " + fileName + " - turn resume off to not detect.", "FtpClient");
+                Debug.WriteLine("Skipping completed " + fileName + " - turn resume off to not detect.", "BaseClient1");
                 return;
             }
 
@@ -541,12 +534,12 @@ namespace WebCamService
 
             if (offset != 0)
             {
-                Debug.WriteLine("Resuming at offset " + offset, "FtpClient");
+                Debug.WriteLine("Resuming at offset " + offset, "BaseClient1");
 
                 input.Seek(offset, SeekOrigin.Begin);
             }
 
-            Debug.WriteLine("Uploading file " + fileName + " to " + remotePath, "FtpClient");
+            Debug.WriteLine("Uploading file " + fileName + " to " + remotePath, "BaseClient1");
 
             while ((bytes = input.Read(buffer, 0, buffer.Length)) > 0)
             {
@@ -621,7 +614,7 @@ namespace WebCamService
 
             if (this.resultCode != 250) throw new FtpException(this.result.Substring(4));
 
-            Debug.WriteLine("Deleted file " + fileName, "FtpClient");
+            Debug.WriteLine("Deleted file " + fileName, "BaseClient1");
         }
 
         /// <summary>
@@ -644,7 +637,7 @@ namespace WebCamService
 
             if (this.resultCode != 250) throw new FtpException(this.result.Substring(4));
 
-            Debug.WriteLine("Renamed file " + oldFileName + " to " + newFileName, "FtpClient");
+            Debug.WriteLine("Renamed file " + oldFileName + " to " + newFileName, "BaseClient1");
         }
 
         /// <summary>
@@ -659,7 +652,7 @@ namespace WebCamService
 
             if (this.resultCode != 250 && this.resultCode != 257) throw new FtpException(this.result.Substring(4));
 
-            Debug.WriteLine("Created directory " + dirName, "FtpClient");
+            Debug.WriteLine("Created directory " + dirName, "BaseClient1");
         }
 
         /// <summary>
@@ -674,7 +667,7 @@ namespace WebCamService
 
             if (this.resultCode != 250) throw new FtpException(this.result.Substring(4));
 
-            Debug.WriteLine("Removed directory " + dirName, "FtpClient");
+            Debug.WriteLine("Removed directory " + dirName, "BaseClient1");
         }
 
         /// <summary>
@@ -701,7 +694,7 @@ namespace WebCamService
             // gonna have to do better than this....
             this.remotePath = this.message.Split('"')[1];
 
-            Debug.WriteLine("Current directory is " + this.remotePath, "FtpClient");
+            Debug.WriteLine("Current directory is " + this.remotePath, "BaseClient1");
         }
 
         /// <summary>
@@ -750,7 +743,7 @@ namespace WebCamService
             {
                 for (int i = 0; i < msg.Length - 1; i++)
                 {
-                    Debug.Write(msg[i], "FtpClient");
+                    Debug.Write(msg[i], "BaseClient1");
                 }
             }
 
@@ -763,7 +756,7 @@ namespace WebCamService
         /// <param name="command"></param>
         private void sendCommand(String command)
         {
-            if (this.verboseDebugging) Debug.WriteLine(command, "FtpClient");
+            if (this.verboseDebugging) Debug.WriteLine(command, "BaseClient1");
 
             Byte[] cmdBytes = Encoding.ASCII.GetBytes((command + "\r\n").ToCharArray());
             clientSocket.Send(cmdBytes, cmdBytes.Length, 0);
@@ -820,17 +813,17 @@ namespace WebCamService
         /// <summary>
         /// Destuctor
         /// </summary>
-        ~FtpClient()
+        ~BaseClient1()
         {
             this.cleanup();
         }
 
 
-        /**************************************************************************************************************/
+        *//**************************************************************************************************************//*
         #region Async methods (auto generated)
 
-        /*
-                        WinInetApi.FtpClient ftp = new WinInetApi.FtpClient();
+        *//*
+                        WinInetApi.BaseClient1 ftp = new WinInetApi.BaseClient1();
 
                         MethodInfo[] methods = ftp.GetType().GetMethods(BindingFlags.DeclaredOnly|BindingFlags.Instance|BindingFlags.Public);
 
@@ -859,7 +852,7 @@ namespace WebCamService
                             Debug.WriteLine("}");
                             //Debug.WriteLine(method);
                         }
-        */
+        *//*
 
 
         private delegate void LoginCallback();
@@ -973,4 +966,4 @@ namespace WebCamService
 
         #endregion
     }
-}
+}*/
