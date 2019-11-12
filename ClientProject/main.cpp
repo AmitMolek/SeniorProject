@@ -68,10 +68,10 @@ int main(){
 	//ClientSocket cs("10.0.0.100");
 	//ClientSocket cs;
 	
-	//testReadFile();
+	testReadFile();
 
 	SocketHelper::InitWinSock();
 	//BaseClient bc{"10.0.0.29", "23456", "23457"};
 	//BaseClient bc{ "10.10.1.3", "23456", "23457" };
-	BaseClient bc{ "127.0.0.1", "23456", "23457" };
+	//BaseClient bc{ "127.0.0.1", "23456", "23457" };
 }
