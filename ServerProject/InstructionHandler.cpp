@@ -35,8 +35,7 @@ void InstructionHandler::Handle_Pass_data_socket_id(Instruction ins, ConnectionI
 void InstructionHandler::Handle_Pass_file_send(Instruction ins, ConnectionInfo& con) {
 	string fileName = ins.content[0];
 	int fileSize = stoi(ins.content[1]);
-	FileUploadInfo fileUpload(fileName, fileSize);
-
+	
 	ofstream outFile;
-	CommunicationHandler::ReceiveFile(*con.dataSocket, outFile, fileUpload);
+	CommunicationHandler::ReceiveFile(*con.dataSocket, outFile, {fileName, fileSize});
 }
