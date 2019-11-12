@@ -1,6 +1,8 @@
 ﻿using System.Windows;
-using WebCamService;
+using client;
 using System.IO;
+using System.Threading;
+
 namespace clientCS
 {
     /// <summary>
@@ -9,7 +11,7 @@ namespace clientCS
     public partial class MainWindow : Window
     {
 
-        FtpClient ftp;
+        BaseClient ftp;
         public MainWindow()
         {
             InitializeComponent();
@@ -17,14 +19,19 @@ namespace clientCS
 
         private void btnConnect_Click(object sender, RoutedEventArgs e)
         {
-           this.ftp = new FtpClient();
-            ftp.Login();
+            Thread t = new Thread(btnConnect_click_thread);
+            t.Start();
+           
             //ftp.Upload(@"C:\לימודים\פרוייקט סוף\image1.jpg");
             //   ftp.Close();
         }
+        private void btnConnect_click_thread()
+        {
+            this.ftp = new BaseClient("127.0.0.1", 23456, 23457);
+        }
         private void btnSendFile_Click(object sender, RoutedEventArgs e)
         {
-            this.ftp.Upload(@"C:\לימודים\פרוייקט סוף\image1.jpg");
+          // this.ftp.Upload(@"C:\לימודים\פרוייקט סוף\image1.jpg");
             //   ftp.Close();
         }
 
