@@ -8,11 +8,15 @@
 #include <future>
 #include <chrono>
 #include <string>
+#include <fstream>
 
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 
+#include <filesystem>
+
 using namespace std;
+namespace fs = std::filesystem;
 
 #define INSTRUCTION_BUFFER_SIZE 1024
 
@@ -132,6 +136,63 @@ void BaseClient::ConnectInstructionSocket() {
 	instructionThread.detach();
 }
 
+void testReadFile(SOCKET& insSocket, SOCKET& dataSocket) {
+	fs::path projectPath = fs::current_path();
+	fs::path testFolder = "TestFiles";
+
+	fs::path testPath = projectPath;
+	fs::path testFilePath;
+	testPath /= testFolder;
+	testFilePath = testPath;
+	testFilePath /= "testFile.jpg";
+
+	cout << "Test file path: " << testFilePath << '\n';
+
+	ifstream testFile(testFilePath, std::ios::binary);
+
+	if (!testFile) {
+		cerr << "Test file could not be open!" << '\n';
+		exit(EXIT_FAILURE);
+	}
+
+	cout << "Test file is open!" << '\n';
+
+	const int bufferSize = 1024;
+	char buffer[bufferSize];
+
+	streampos begSeek = testFile.tellg();
+	testFile.seekg(0, std::ios::end);
+	streampos endSeek = testFile.tellg();
+	streampos fileSize = endSeek - begSeek;
+
+	cout << "File size = " << fileSize << '\n';
+	cout << "Loops = " << fileSize / 1024 << '\n';
+
+	testFile.seekg(0, std::ios::beg);
+
+	fs::path outputFilePath = testPath;
+	outputFilePath /= "output.jpg";
+
+	ofstream outputFile(outputFilePath, std::ios::binary);
+	if (!outputFile) {
+		cerr << "Output file could not be open!" << '\n';
+		exit(EXIT_FAILURE);
+	}
+
+	string msgg("|pass:file_start");
+	send(dataSocket, msgg.c_str(), msgg.size(), 0);
+	while (!testFile.eof()) {
+		testFile.read(buffer, bufferSize);
+		//outputFile.write(buffer, bufferSize);
+		send(dataSocket, buffer, bufferSize, 0);
+	}
+	msgg = ("|pass:file_end");
+	send(dataSocket, msgg.c_str(), msgg.size(), 0);
+
+	testFile.close();
+	outputFile.close();
+}
+
 void Thread_HandleInstruction(SOCKET&& instructionSocket, SOCKET&& dataSocket, struct addrinfo* dataResult) {
 	int receivedBytes = -1;
 	char instructionBuffer[INSTRUCTION_BUFFER_SIZE];
@@ -176,8 +237,12 @@ void Thread_HandleInstruction(SOCKET&& instructionSocket, SOCKET&& dataSocket, s
 						}
 					}else if (splitInstructions[1] == "socket_id"){
 						Sleep(2000);
-						string dataSocketIdMsg = "|pass:dick1:54,67,12,gay|pass:dick2";
+						cout << "SENT GAY GSHIIT\n";
+						//string dataSocketIdMsg = "|pass:dick1:54,67,12,gay|pass:dick2";
+						string dataSocketIdMsg = "|pass:file_send:gay.shit,400";
 						send(instructionSocket, dataSocketIdMsg.c_str(), dataSocketIdMsg.size(), 0);
+					}else if (splitInstructions[1] == "server_wait_on_file"){
+						testReadFile(instructionSocket, dataSocket);
 					}
 				}
 			}

@@ -1,11 +1,13 @@
 #include "InstructionHandler.h"
 #include "ConsoleOutput.h"
 #include "CommunicationHandler.h"
+#include "DataTransferHandler.h"
 
 #include <iostream>
 #include <WinSock2.h>
 #include <string>
 #include <utility>
+#include <thread>
 
 using namespace std;
 
@@ -20,6 +22,8 @@ void InstructionHandler::HandleInstruction(Instruction ins, ConnectionInfo& con)
 void InstructionHandler::Handle_Pass(Instruction ins, ConnectionInfo& con){
 	if (ins.code == "data_socket_id") {
 		InstructionHandler::Handle_Pass_data_socket_id(ins ,con);
+	}else if (ins.code == "file_send"){
+		InstructionHandler::Handle_Pass_file_send(ins, con);
 	}
 }
 
@@ -30,12 +34,18 @@ void InstructionHandler::Handle_Fail(Instruction ins, ConnectionInfo& con){
 void InstructionHandler::Handle_Pass_data_socket_id(Instruction ins, ConnectionInfo& con) {
 	*con.dataSocket = stoi(ins.content[0]);
 	ConsoleOutput() << "[INFO][" << con.clientAddress << "] Got data socket " << *con.dataSocket << "\n";
+
+	CommunicationHandler::SendBasicMsg(*con.instructionSocket, "|pass:socket_id");
 }
 
 void InstructionHandler::Handle_Pass_file_send(Instruction ins, ConnectionInfo& con) {
 	string fileName = ins.content[0];
 	int fileSize = stoi(ins.content[1]);
-	
-	ofstream outFile;
-	CommunicationHandler::ReceiveFile(*con.dataSocket, outFile, {fileName, fileSize});
+	FileUploadInfo fileInfo(fileName, fileSize);
+
+	//ofstream outFile;
+	//CommunicationHandler::ReceiveFile(*con.dataSocket, outFile, fileInfo);
+
+	std::thread dataTransferThread(DataTransferHandler::Thread_GetData, &con, fileInfo);
+	dataTransferThread.detach();
 }

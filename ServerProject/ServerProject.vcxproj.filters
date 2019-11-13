@@ -25,6 +25,12 @@
     <Filter Include="Header Files\Protocol">
       <UniqueIdentifier>{eab0ef84-dccf-4fd7-b3d1-411cbcd9e710}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Thread">
+      <UniqueIdentifier>{44e44b41-d089-4328-8356-128e001f2c89}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Thread">
+      <UniqueIdentifier>{d6a594c7-03c9-4283-9259-1cd3a8b3b8a7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -42,6 +48,9 @@
     <ClCompile Include="CommunicationHandler.cpp">
       <Filter>Source Files\Protocol</Filter>
     </ClCompile>
+    <ClCompile Include="DataTransferHandler.cpp">
+      <Filter>Source Files\Thread</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -58,6 +67,9 @@
     </ClInclude>
     <ClInclude Include="CommunicationHandler.h">
       <Filter>Header Files\Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="DataTransferHandler.h">
+      <Filter>Header Files\Thread</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
