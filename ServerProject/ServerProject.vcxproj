@@ -22,6 +22,7 @@
     <ClCompile Include="BaseServer.cpp" />
     <ClCompile Include="CommunicationHandler.cpp" />
     <ClCompile Include="ConsoleOutput.cpp" />
+    <ClCompile Include="DataTransferHandler.cpp" />
     <ClCompile Include="InstructionHandler.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
@@ -29,6 +30,7 @@
     <ClInclude Include="BaseServer.h" />
     <ClInclude Include="CommunicationHandler.h" />
     <ClInclude Include="ConsoleOutput.h" />
+    <ClInclude Include="DataTransferHandler.h" />
     <ClInclude Include="InstructionHandler.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
@@ -175,12 +177,12 @@
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="..\packages\boost.1.70.0.0\build\boost.targets" Condition="Exists('..\packages\boost.1.70.0.0\build\boost.targets')" />
+    <Import Project="..\packages\boost.1.71.0.0\build\boost.targets" Condition="Exists('..\packages\boost.1.71.0.0\build\boost.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\boost.1.70.0.0\build\boost.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost.1.70.0.0\build\boost.targets'))" />
+    <Error Condition="!Exists('..\packages\boost.1.71.0.0\build\boost.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost.1.71.0.0\build\boost.targets'))" />
   </Target>
 </Project>
