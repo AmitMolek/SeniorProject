@@ -14,7 +14,6 @@
     <ProjectCapability Include="SourceItemsFromImports" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="$(MSBuildThisFileDirectory)ConnectionInfo.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)FileUploadInfo.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)InstructionResolver.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)SendFailedException.cpp" />
@@ -22,7 +21,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)SocketVector.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="$(MSBuildThisFileDirectory)ConnectionInfo.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)FileUploadInfo.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)InstructionResolver.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)SendFailedException.h" />

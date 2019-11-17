@@ -1,12 +1,32 @@
 #include "SocketHelper.h"
 #include "BaseServer.h"
 
+#include "VStorage.h"
+#include <filesystem>
+
+#include <sstream>
+#include <fstream>
+#include <istream>
+#include <ostream>
+#include "VFile.h"
+#include "FileUploadInfo.h"
+
 #define INSTRUCTION_PORT "23456"
 #define DATA_PORT "23457"
 
 int main() {
 	SocketHelper::InitWinSock();
-	BaseServer bs{INSTRUCTION_PORT, DATA_PORT};
+	
+	VStorage virtualStorage(fs::current_path(), 1024, 4);
+	//BaseServer bs{INSTRUCTION_PORT, DATA_PORT, virtualStorage};
+	//
+	//while (true);
 
-	while (true);
+	FileUploadInfo fileInfo("gay.txt", 500);
+	VFile file;
+	virtualStorage.AllocateFile(file, fileInfo);
+	std::cout << file << "\n";
+	VFile file2 = std::move(file);
+	std::cout << file2 << "\n";
+	std::cout << file << "\n";
 }

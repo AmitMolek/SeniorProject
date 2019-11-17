@@ -9,9 +9,11 @@
 #include <string>
 #include <boost/algorithm/string.hpp>
 
+#include <sstream>
+
 using namespace std;
 
-namespace fs = experimental::filesystem;
+namespace fs = filesystem;
 
 void DataTransferHandler::Thread_GetData(ConnectionInfo* con, FileUploadInfo fileInfo) {
 	std::pair<int, string> msgInfo;
@@ -26,33 +28,43 @@ void DataTransferHandler::Thread_GetData(ConnectionInfo* con, FileUploadInfo fil
 	fs::create_directories(testFilePath);
 	testFilePath /= "testFile.jpg";
 
+	VFile outFile(testFilePath, fileInfo.fileName, fileInfo.fileSize);
+
 	ConsoleOutput() << "[INFO][" << con->clientAddress << "] Started handling client file " << fileInfo.fileName << "\n";
 	CommunicationHandler::SendBasicMsg(*con->instructionSocket, "|pass:server_wait_on_file");
-	
-	ofstream outFile(testFilePath, std::ios::binary);
 
-	bool isEnd = false;
+	string fileStartInstruction = "|pass:file_start";
+	string fileEndInstruction = "|pass:file_end";
+
+	bool isSendStart = false;
+	bool isSendEnd = false;
+
 	while ((msgInfo = CommunicationHandler::ReceiveMsg(*con->dataSocket)).first != -1){
 		string msg = msgInfo.second;
-		//ConsoleOutput() << "[INFO][" << con->clientAddress << "] Sent data: " << msg << "\n";
-		if (boost::contains(msg, "|pass:file_start")) {
-			string test = "|pass:file_start";
-			auto pos = msg.find(test);
-			msg.erase(pos, test.size());
-			cout << "FOUND START\n";
+		size_t fileStartPos = msg.find(fileStartInstruction);
+		size_t fileEndPos = msg.find(fileEndInstruction);
+
+		if (fileStartPos != std::string::npos) {
+			msg.erase(fileStartPos, fileStartInstruction.size());
+			ConsoleOutput() << "[INFO][" << con->clientAddress << "] Start receiving file " << fileInfo.fileName << "\n";
+			isSendStart = true;
+			outFile.OpenFileStream();
 		}
-		if (boost::contains(msg, "|pass:file_end")) {
-			string test = "|pass:file_end";
-			auto pos = msg.find(test);
-			msg.erase(pos, test.size());
-			cout << "FOUND END\n";
-			isEnd = true;
+		if (fileEndPos != std::string::npos) {
+			msg.erase(fileEndPos, fileEndInstruction.size());
+			ConsoleOutput() << "[INFO][" << con->clientAddress << "] Stopped receiving file " << fileInfo.fileName << "\n";
+			isSendEnd = true;
 		}
-		outFile.write(msg.c_str(), msg.size());
-		if (isEnd) {
-			outFile.close();
-			cout << "CLOSED FILE\n";
+
+		if (isSendStart)
+			outFile << msg;
+
+		if (isSendEnd) {
+			outFile.CloseFileStream();
+			ConsoleOutput() << "[INFO][" << con->clientAddress << "] Closed file " << fileInfo.fileName << "\n";
 			break;
 		}
 	}
+
+	ConsoleOutput() << "[INFO][" << con->clientAddress << "] Stopped handling client file " << fileInfo.fileName << "\n";
 }

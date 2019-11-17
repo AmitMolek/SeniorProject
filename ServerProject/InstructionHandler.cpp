@@ -2,6 +2,8 @@
 #include "ConsoleOutput.h"
 #include "CommunicationHandler.h"
 #include "DataTransferHandler.h"
+#include "VFile.h"
+#include "VStorage.h"
 
 #include <iostream>
 #include <WinSock2.h>
@@ -43,8 +45,7 @@ void InstructionHandler::Handle_Pass_file_send(Instruction ins, ConnectionInfo& 
 	int fileSize = stoi(ins.content[1]);
 	FileUploadInfo fileInfo(fileName, fileSize);
 
-	//ofstream outFile;
-	//CommunicationHandler::ReceiveFile(*con.dataSocket, outFile, fileInfo);
+	//VFile outFile = con.storage->GetFile(fileInfo);
 
 	std::thread dataTransferThread(DataTransferHandler::Thread_GetData, &con, fileInfo);
 	dataTransferThread.detach();

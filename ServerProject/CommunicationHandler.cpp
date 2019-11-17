@@ -28,6 +28,6 @@ int CommunicationHandler::SendBasicMsg(SOCKET& socket, std::string _msg){
 	return sentBytes;
 }
 
-void CommunicationHandler::ReceiveFile(SOCKET& socket, std::ofstream& fileStream, FileUploadInfo& fileInfo) {
+void CommunicationHandler::ReceiveFile(SOCKET& socket, VFile& fileStream) {
 	
 }
