@@ -21,18 +21,30 @@
   <ItemGroup>
     <ClCompile Include="BaseServer.cpp" />
     <ClCompile Include="CommunicationHandler.cpp" />
+    <ClCompile Include="ConnectionInfo.cpp" />
     <ClCompile Include="ConsoleOutput.cpp" />
     <ClCompile Include="DataTransferHandler.cpp" />
     <ClCompile Include="InstructionHandler.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="VContainer.cpp" />
+    <ClCompile Include="VFile.cpp" />
+    <ClCompile Include="VFolder.cpp" />
+    <ClCompile Include="VStorage.cpp" />
+    <ClCompile Include="VStorageHelper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseServer.h" />
     <ClInclude Include="CommunicationHandler.h" />
+    <ClInclude Include="ConnectionInfo.h" />
     <ClInclude Include="ConsoleOutput.h" />
     <ClInclude Include="DataTransferHandler.h" />
     <ClInclude Include="InstructionHandler.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="VContainer.h" />
+    <ClInclude Include="VFile.h" />
+    <ClInclude Include="VFolder.h" />
+    <ClInclude Include="VStorage.h" />
+    <ClInclude Include="VStorageHelper.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ServerProject.rc" />

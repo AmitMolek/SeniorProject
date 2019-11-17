@@ -22,9 +22,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)SendFailedException.cpp">
       <Filter>Exception</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)ConnectionInfo.cpp">
-      <Filter>DataStructure</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)FileUploadInfo.cpp">
       <Filter>DataStructure</Filter>
     </ClCompile>
@@ -39,9 +36,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)InstructionResolver.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)SendFailedException.h">
       <Filter>Exception</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)ConnectionInfo.h">
-      <Filter>DataStructure</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)FileUploadInfo.h">
       <Filter>DataStructure</Filter>

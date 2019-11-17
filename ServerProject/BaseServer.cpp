@@ -14,7 +14,7 @@
 
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
-#include <ConnectionInfo.h>
+#include "ConnectionInfo.h"
 #include "InstructionHandler.h"
 
 using namespace std;
@@ -22,9 +22,10 @@ using namespace std;
 constexpr auto BUFFER_SIZE = 1024;
 
 void* get_in_addr(struct sockaddr* sa);
-void Thread_Accept(SOCKET _socket, string socketPrefix, bool spawnThread);
+void Thread_Accept(SOCKET _socket, string socketPrefix, VStorage* vStorage, bool spawnThread);
+void Thread_HandleClient(SOCKET instructionSocket, string clientAddress, VStorage* vStorage);
 
-BaseServer::BaseServer(PCSTR _dataPort, PCSTR _instructionPort) {
+BaseServer::BaseServer(PCSTR _dataPort, PCSTR _instructionPort, VStorage& _storage) : storage(_storage) {
 	instructionSocket = INVALID_SOCKET;
 	dataSocket = INVALID_SOCKET;
 
@@ -50,8 +51,8 @@ void BaseServer::StartServer() {
 }
 
 void BaseServer::StartAccepting() {
-	std::thread instructionAcceptThread(Thread_Accept, instructionSocket, "instruction", true);
-	std::thread dataAcceptThread(Thread_Accept, dataSocket, "data", false);
+	std::thread instructionAcceptThread(Thread_Accept, instructionSocket, "instruction", &storage, true);
+	std::thread dataAcceptThread(Thread_Accept, dataSocket, "data", &storage, false);
 	instructionAcceptThread.detach();
 	dataAcceptThread.detach();
 }
@@ -141,7 +142,7 @@ void* get_in_addr(struct sockaddr* sa) {
 	return &(((struct sockaddr_in6*)sa)->sin6_addr);
 }
 
-void Thread_HandleClient(SOCKET instructionSocket, string clientAddress){
+void Thread_HandleClient(SOCKET instructionSocket, string clientAddress, VStorage* vStorage){
 	char msgBuffer[BUFFER_SIZE];
 
 	int recievedBytes = -1;
@@ -151,7 +152,7 @@ void Thread_HandleClient(SOCKET instructionSocket, string clientAddress){
 	string clientPrefix = "[" + clientAddress + "]";
 	string msgToSend;
 
-	ConnectionInfo clientCon(&instructionSocket, &dataSocket, clientAddress);
+	ConnectionInfo clientCon(&instructionSocket, &dataSocket, clientAddress, vStorage);
 
 	ConsoleOutput() << "[INFO]" << clientPrefix << " Started handling client\n";
 
@@ -171,7 +172,7 @@ void Thread_HandleClient(SOCKET instructionSocket, string clientAddress){
 	ConsoleOutput() << "[INFO] Client [" << clientAddress << "] lost connection\n";
 }
 
-void Thread_Accept(SOCKET _socket, string socketPrefix, bool spawnThread = false) {
+void Thread_Accept(SOCKET _socket, string socketPrefix, VStorage* vStorage, bool spawnThread = false) {
 	SOCKET clientSocket = INVALID_SOCKET;
 
 	struct sockaddr_storage clientAddr;
@@ -198,7 +199,7 @@ void Thread_Accept(SOCKET _socket, string socketPrefix, bool spawnThread = false
 										   "|pass:" + socketPrefix + "_socket:" + std::to_string(clientSocket));
 
 		if (spawnThread) {
-			std::thread clientThread(Thread_HandleClient, clientSocket, clientAddress);
+			std::thread clientThread(Thread_HandleClient, clientSocket, clientAddress, vStorage);
 			clientThread.detach();
 		}
 	}

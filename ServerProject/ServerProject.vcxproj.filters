@@ -31,6 +31,12 @@
     <Filter Include="Header Files\Thread">
       <UniqueIdentifier>{d6a594c7-03c9-4283-9259-1cd3a8b3b8a7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Storage">
+      <UniqueIdentifier>{02faa696-15ec-4583-96cf-edfdcab6cfa3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Storage">
+      <UniqueIdentifier>{20923967-b16e-4f62-97ce-b574e6fa511d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -51,6 +57,24 @@
     <ClCompile Include="DataTransferHandler.cpp">
       <Filter>Source Files\Thread</Filter>
     </ClCompile>
+    <ClCompile Include="VContainer.cpp">
+      <Filter>Source Files\Storage</Filter>
+    </ClCompile>
+    <ClCompile Include="VStorage.cpp">
+      <Filter>Source Files\Storage</Filter>
+    </ClCompile>
+    <ClCompile Include="VFolder.cpp">
+      <Filter>Source Files\Storage</Filter>
+    </ClCompile>
+    <ClCompile Include="VFile.cpp">
+      <Filter>Source Files\Storage</Filter>
+    </ClCompile>
+    <ClCompile Include="VStorageHelper.cpp">
+      <Filter>Source Files\Storage</Filter>
+    </ClCompile>
+    <ClCompile Include="ConnectionInfo.cpp">
+      <Filter>Source Files\Protocol</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -70,6 +94,24 @@
     </ClInclude>
     <ClInclude Include="DataTransferHandler.h">
       <Filter>Header Files\Thread</Filter>
+    </ClInclude>
+    <ClInclude Include="VContainer.h">
+      <Filter>Header Files\Storage</Filter>
+    </ClInclude>
+    <ClInclude Include="VStorage.h">
+      <Filter>Header Files\Storage</Filter>
+    </ClInclude>
+    <ClInclude Include="VFolder.h">
+      <Filter>Header Files\Storage</Filter>
+    </ClInclude>
+    <ClInclude Include="VFile.h">
+      <Filter>Header Files\Storage</Filter>
+    </ClInclude>
+    <ClInclude Include="VStorageHelper.h">
+      <Filter>Header Files\Storage</Filter>
+    </ClInclude>
+    <ClInclude Include="ConnectionInfo.h">
+      <Filter>Header Files\Protocol</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

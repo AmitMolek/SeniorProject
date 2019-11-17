@@ -1,4 +1,6 @@
 #pragma once
+
+#include "VStorage.h"
 #include <WinSock2.h>
 
 class BaseServer {
@@ -12,7 +14,9 @@ public:
 	PCSTR dataPort;
 	PCSTR instructionPort;
 
-	BaseServer(PCSTR _dataPort, PCSTR _instructionPort);
+	VStorage& storage;
+
+	BaseServer(PCSTR _dataPort, PCSTR _instructionPort, VStorage& _storage);
 
 private:
 	void CreateInstructionSocket();
