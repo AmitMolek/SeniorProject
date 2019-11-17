@@ -11,7 +11,7 @@
 
 using namespace std;
 
-namespace fs = experimental::filesystem;
+namespace fs = filesystem;
 
 void DataTransferHandler::Thread_GetData(ConnectionInfo* con, FileUploadInfo fileInfo) {
 	std::pair<int, string> msgInfo;
@@ -24,7 +24,7 @@ void DataTransferHandler::Thread_GetData(ConnectionInfo* con, FileUploadInfo fil
 	testPath /= testFolder;
 	testFilePath = testPath;
 	fs::create_directories(testFilePath);
-	testFilePath /= "testFile.jpg";
+	testFilePath /= fileInfo.fileName;
 
 	ConsoleOutput() << "[INFO][" << con->clientAddress << "] Started handling client file " << fileInfo.fileName << "\n";
 	CommunicationHandler::SendBasicMsg(*con->instructionSocket, "|pass:server_wait_on_file");
