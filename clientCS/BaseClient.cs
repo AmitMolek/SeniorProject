@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Net.Sockets;
 using System.Net;
+using System.IO;
 namespace client
 {
 
@@ -36,13 +37,18 @@ namespace client
 
             GetDataSocket();
 
-            ConnectInstructionSocket();
+            Thread t = new Thread(connectClient);
+            t.Start();
+
             //Sleep(3000);
             //ConnectDataSocket();
 
-            while (true) ;
+            // while (true) ;
         }
-
+        public void connectClient()
+        {
+            ConnectInstructionSocket();
+        }
         public class FtpException : Exception
         {
             public FtpException(string message) : base(message) { }
@@ -89,8 +95,9 @@ namespace client
                 throw new FtpException("Couldn't connect to remote server", ex);
             }
 
-            Thread ConnectDataSocketConnectionThread = new Thread(Thread_HandleInstruction);
-            ConnectDataSocketConnectionThread.Start();
+            //  Thread ConnectDataSocketConnectionThread = new Thread(Thread_HandleInstruction);
+            // ConnectDataSocketConnectionThread.Start();
+            Thread_HandleInstruction();
         }
         void ConnectDataSocketThread()
         {
@@ -204,6 +211,33 @@ namespace client
             }
 
             Console.WriteLine("end reading instruction");
+        }
+        public void sendFile(String fileName)
+        {
+            long fileSize;
+            int bytes = 0;
+            int bytesToSend = 0;
+            byte[] dataBuffer = new byte[INSTRUCTION_BUFFER_SIZE];
+
+            fileSize = new System.IO.FileInfo(fileName).Length;
+            Console.WriteLine((string)("|pass:file_send:img1.jpeg," + fileSize));
+            instructionSocket.Send(Encoding.ASCII.GetBytes((string)("|pass:file_send:img1.jpeg,"+ fileSize)),0);
+
+
+           
+
+            FileStream input = File.OpenRead(fileName);
+            dataSocket.Send(Encoding.ASCII.GetBytes("|pass:file_start"), 0);
+
+            while ((bytes = input.Read(dataBuffer, 0, dataBuffer.Length)) > 0)
+            {
+                bytesToSend += bytes;
+                dataSocket.Send(dataBuffer, bytes, 0);
+
+                bytesToSend = 0; 
+            }
+            dataSocket.Send(Encoding.ASCII.GetBytes("|pass:file_end"), 0);
+            input.Close();
         }
     }
 

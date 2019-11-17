@@ -26,7 +26,7 @@ void DataTransferHandler::Thread_GetData(ConnectionInfo* con, FileUploadInfo fil
 	testPath /= testFolder;
 	testFilePath = testPath;
 	fs::create_directories(testFilePath);
-	testFilePath /= "testFile.jpg";
+	testFilePath /= fileInfo.fileName;
 
 	VFile outFile(testFilePath, fileInfo.fileName, fileInfo.fileSize);
 

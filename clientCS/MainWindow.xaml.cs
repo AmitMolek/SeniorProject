@@ -11,27 +11,23 @@ namespace clientCS
     public partial class MainWindow : Window
     {
 
-        BaseClient ftp;
+        static  BaseClient ftp;
         public MainWindow()
         {
             InitializeComponent();
         }
 
+        
+
         private void btnConnect_Click(object sender, RoutedEventArgs e)
         {
-            Thread t = new Thread(btnConnect_click_thread);
-            t.Start();
+            ftp = new BaseClient("127.0.0.1", 23456, 23457);
            
-            //ftp.Upload(@"C:\לימודים\פרוייקט סוף\image1.jpg");
-            //   ftp.Close();
         }
-        private void btnConnect_click_thread()
-        {
-            this.ftp = new BaseClient("127.0.0.1", 23456, 23457);
-        }
+       
         private void btnSendFile_Click(object sender, RoutedEventArgs e)
         {
-          // this.ftp.Upload(@"C:\לימודים\פרוייקט סוף\image1.jpg");
+           ftp.sendFile(@"C:\לימודים\פרוייקט סוף\image1.jpg");
             //   ftp.Close();
         }
 
@@ -56,5 +52,7 @@ namespace clientCS
         {
             e.Handled = true;
         }
+
+       
     }
 }
