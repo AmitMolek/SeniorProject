@@ -55,7 +55,10 @@ namespace client
             public FtpException(string message, Exception innerException) : base(message, innerException) { }
         }
 
-
+        public Socket getDataSocket()
+        {
+            return this.dataSocket;
+        }
         void GetInstructionSocket()
         {
             this.instructionSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
@@ -215,13 +218,15 @@ namespace client
         public void sendFile(String fileName)
         {
             long fileSize;
+            string[] splitMsg;
             int bytes = 0;
             int bytesToSend = 0;
             byte[] dataBuffer = new byte[INSTRUCTION_BUFFER_SIZE];
 
             fileSize = new System.IO.FileInfo(fileName).Length;
-            Console.WriteLine((string)("|pass:file_send:img1.jpeg," + fileSize));
-            instructionSocket.Send(Encoding.ASCII.GetBytes((string)("|pass:file_send:img1.jpeg,"+ fileSize)),0);
+            splitMsg = fileName.Split('\\');
+            Console.WriteLine((string)("|pass:file_send:" + splitMsg [splitMsg.Length-1] + "," + fileSize));
+            instructionSocket.Send(Encoding.ASCII.GetBytes((string)("|pass:file_send:" + splitMsg[splitMsg.Length - 1] + "," + fileSize)),0);
 
 
            

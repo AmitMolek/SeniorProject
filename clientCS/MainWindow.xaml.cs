@@ -2,6 +2,8 @@
 using client;
 using System.IO;
 using System.Threading;
+using System;
+using Microsoft.Win32;
 
 namespace clientCS
 {
@@ -22,12 +24,16 @@ namespace clientCS
         private void btnConnect_Click(object sender, RoutedEventArgs e)
         {
             ftp = new BaseClient("127.0.0.1", 23456, 23457);
+            while (ftp.getDataSocket().Connected == false) ;
            
+            lblConnectionStatus.Content = "connected";
+            
         }
        
         private void btnSendFile_Click(object sender, RoutedEventArgs e)
         {
-           ftp.sendFile(@"C:\לימודים\פרוייקט סוף\image1.jpg");
+            string filePath = txtPath.Text;
+           ftp.sendFile(filePath);
             //   ftp.Close();
         }
 
@@ -44,7 +50,7 @@ namespace clientCS
         private void TextBox_Drop(object sender, DragEventArgs e)
         {
             string[] fileloadup = (string[])e.Data.GetData(DataFormats.FileDrop);//Get the filename including path
-            txtPath.Text = File.ReadAllText(fileloadup[0]);//Load data to textBox2
+            txtPath.Text = fileloadup[0];//Load data to textBox2
 
         }
 
@@ -53,6 +59,11 @@ namespace clientCS
             e.Handled = true;
         }
 
-       
+        private void btnBrowse_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            if (openFileDialog.ShowDialog() == true)
+                txtPath.Text = openFileDialog.FileName;
+        }
     }
 }
