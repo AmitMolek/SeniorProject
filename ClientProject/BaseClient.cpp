@@ -239,7 +239,7 @@ void Thread_HandleInstruction(SOCKET&& instructionSocket, SOCKET&& dataSocket, s
 						Sleep(2000);
 						cout << "SENT GAY GSHIIT\n";
 						//string dataSocketIdMsg = "|pass:dick1:54,67,12,gay|pass:dick2";
-						string dataSocketIdMsg = "|pass:file_send:gay.shit,400";
+						string dataSocketIdMsg = "|pass:file_send:gay.jpg,400";
 						send(instructionSocket, dataSocketIdMsg.c_str(), dataSocketIdMsg.size(), 0);
 					}else if (splitInstructions[1] == "server_wait_on_file"){
 						testReadFile(instructionSocket, dataSocket);

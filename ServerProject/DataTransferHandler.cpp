@@ -28,7 +28,10 @@ void DataTransferHandler::Thread_GetData(ConnectionInfo* con, FileUploadInfo fil
 	fs::create_directories(testFilePath);
 	testFilePath /= fileInfo.fileName;
 
-	VFile outFile(testFilePath, fileInfo.fileName, fileInfo.fileSize);
+	VFile outFile;
+	con->storage->AllocateFile(outFile, fileInfo);
+
+	ConsoleOutput() << outFile << "\n";
 
 	ConsoleOutput() << "[INFO][" << con->clientAddress << "] Started handling client file " << fileInfo.fileName << "\n";
 	CommunicationHandler::SendBasicMsg(*con->instructionSocket, "|pass:server_wait_on_file");
