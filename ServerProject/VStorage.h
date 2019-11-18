@@ -20,5 +20,7 @@ public:
 
 private:
 	void CreateContainers(std::vector<VContainer>& _containers, unsigned int count);
+
+	void CreatePathFolders();
 };
 

@@ -18,7 +18,11 @@ public:
 	VContainer(VContainer&& other);
 	VContainer(fs::path _rootPath, unsigned long long int _capacity);
 
+	// Opens the container
 	void OpenContainer();
+	// Closes the container
 	void CloseContainer();
+	// Creates the folder if it doesnt exists
+	bool CreateContainerFolder();
 };
 

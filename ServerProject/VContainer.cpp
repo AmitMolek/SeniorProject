@@ -20,6 +20,8 @@ VContainer::VContainer(fs::path _rootPath, unsigned long long int _capacity) : f
 	capacity = _capacity;
 
 	isContainerClosed = false;
+
+	CreateContainerFolder();
 }
 
 void VContainer::OpenContainer(){
@@ -28,4 +30,11 @@ void VContainer::OpenContainer(){
 
 void VContainer::CloseContainer() {
 	isContainerClosed = true;
+}
+
+bool VContainer::CreateContainerFolder() {
+	if (!fs::exists(rootPath)) {
+		fs::create_directories(rootPath);
+		return false;
+	} else return true;
 }

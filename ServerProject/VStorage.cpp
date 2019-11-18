@@ -4,6 +4,8 @@
 VStorage::VStorage(fs::path _rootPath, unsigned int _capacity, unsigned int containersCount) : containers(){
 	rootPath = _rootPath;
 	capacity = _capacity;
+
+	CreatePathFolders();
 }
 
 void VStorage::CreateContainers(std::vector<VContainer>& _containers, unsigned int count) {
@@ -20,4 +22,9 @@ void VStorage::AllocateFile(VFile& vFile, FileUploadInfo& _fileInfo){
 	filePath /= _fileInfo.fileName;
 
 	vFile = VFile(filePath, _fileInfo.fileName, _fileInfo.fileSize);
+}
+
+void VStorage::CreatePathFolders() {
+	if (!fs::exists(rootPath))
+		fs::create_directories(rootPath);
 }
