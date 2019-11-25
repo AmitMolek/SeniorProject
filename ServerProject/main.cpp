@@ -12,6 +12,8 @@
 #include "FileUploadInfo.h"
 #include "StorageObject.h"
 
+#include "dbHandler.h"
+
 #define INSTRUCTION_PORT "23456"
 #define DATA_PORT "23457"
 
@@ -28,6 +30,4 @@ int main() {
 	BaseServer bs{INSTRUCTION_PORT, DATA_PORT, virtualStorage};
 	
 	while (true);
-
-
 }

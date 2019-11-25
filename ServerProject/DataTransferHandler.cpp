@@ -35,10 +35,6 @@ void DataTransferHandler::Thread_GetData(ConnectionInfo* con, FileUploadInfo fil
 
 	VFile outFile;
 	con->storage->AllocateFile(outFile, fileInfo);
-	
-	fs::path storagePath =con->storage->GetPath();
-	
-	db::addFileToDB(outFile.fileName, outFile.rootPath,con->username, storagePath);
 
 	ConsoleOutput() << outFile << "\n" ;
 
@@ -73,6 +69,7 @@ void DataTransferHandler::Thread_GetData(ConnectionInfo* con, FileUploadInfo fil
 
 		if (isSendEnd) {
 			outFile.CloseFileStream();
+			db::Database::Instance() << make_pair(&outFile, con);
 			ConsoleOutput() << "[INFO][" << con->clientAddress << "] Closed file " << fileInfo.fileName << "\n";
 			break;
 		}

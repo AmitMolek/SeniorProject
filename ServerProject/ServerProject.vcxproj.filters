@@ -63,9 +63,6 @@
     <ClCompile Include="VStorage.cpp">
       <Filter>Source Files\Storage</Filter>
     </ClCompile>
-    <ClCompile Include="VFolder.cpp">
-      <Filter>Source Files\Storage</Filter>
-    </ClCompile>
     <ClCompile Include="VFile.cpp">
       <Filter>Source Files\Storage</Filter>
     </ClCompile>
@@ -108,9 +105,6 @@
       <Filter>Header Files\Storage</Filter>
     </ClInclude>
     <ClInclude Include="VStorage.h">
-      <Filter>Header Files\Storage</Filter>
-    </ClInclude>
-    <ClInclude Include="VFolder.h">
       <Filter>Header Files\Storage</Filter>
     </ClInclude>
     <ClInclude Include="VFile.h">

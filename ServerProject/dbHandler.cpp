@@ -1,16 +1,92 @@
 #include "dbHandler.h"
-#include "sqlite3.h"
-#include <string>
 #include "ConsoleOutput.h"
+#include "sqlite3.h"
 
+#include <utility>
 
 using namespace std;
-
-
-
-
 namespace fs = std::filesystem;
-  bool dbHandler::addFileToDB(string fileName,fs:: path filePath, string userName, fs::path storagePath)
+namespace dbh = dbHandler;
+
+sqlite3* dbh::Database::db = nullptr;
+std::string dbh::Database::name = "";
+
+dbh::Database::Database() {
+	if (!dbh::Database::db)
+		dbh::Database::OpenDatabase("binPacking.db");
+}
+
+dbh::Database& dbHandler::Database::Instance() {
+	dbh::Database instance;
+	return instance;
+}
+
+void dbh::Database::OpenDatabase(std::string dbName){
+	int returnCode = -1;
+
+	dbh::Database::name = dbName;
+
+	if ((returnCode = sqlite3_open(dbh::Database::name.c_str(), &dbh::Database::db))) {
+		ConsoleOutput() << "[SQL-ERR] " << "Can't open database: " << sqlite3_errmsg(dbh::Database::db) << "\n";
+	}
+	ConsoleOutput() << "[SQL-INFO] Database " << dbh::Database::name << " is open\n";
+}
+
+void dbh::Database::CloseDatabase() {
+	if (dbh::Database::db) {
+		sqlite3_close(dbh::Database::db);
+		ConsoleOutput() << "[SQL-INFO] Database " << dbh::Database::name << "is closed\n";
+	}
+}
+
+bool dbh::Database::ExecQuery(std::string query){
+	int returnCode = -1;
+	char* errMsg;
+
+	if ((returnCode = sqlite3_exec(dbh::Database::db, query.c_str(), NULL, 0, &errMsg)) != SQLITE_OK) {
+		ConsoleOutput() << "[SQL-ERR] Failed to execute SQL query: " << query << " | " << errMsg << "\n";
+		sqlite3_free(errMsg);
+		return false;
+	}
+
+	ConsoleOutput() << "[SQL-INFO] Executed SQL query: " << query << "\n";
+	return true;
+}
+
+bool dbh::Database::StoreFile(std::string fileName, 
+							 fs::path filePath, 
+							 std::string userName, 
+							 fs::path storagePath){
+	std::string tmpPath = filePath.string();
+	std::string::size_type i = tmpPath.find(storagePath.string());
+	if (i != std::string::npos) {
+		tmpPath.erase(i, storagePath.string().length());
+	}
+
+	std::replace(tmpPath.begin(), tmpPath.end(), '\\', '/');
+
+	std::string sql = "INSERT INTO files (fileName,folder,owner)"\
+		"VALUES ( '" + fileName + "','" + tmpPath + "', '" + userName + "');";
+
+	return dbh::Database::ExecQuery(sql);
+}
+
+dbh::Database& dbHandler::Database::operator()() {
+	return dbh::Database::Instance();
+}
+
+void dbHandler::operator<<(Database& out, const std::string query) {
+	out.ExecQuery(query);
+}
+
+void dbHandler::operator<<(Database& out, std::pair<VFile*, ConnectionInfo*> uploadInfo) {
+	VFile* file = uploadInfo.first;
+	ConnectionInfo* con = uploadInfo.second;
+
+	out.StoreFile(file->fileName, file->GetPath(), con->username, con->storage->GetPath());
+}
+
+bool dbHandler::addFileToDB(string fileName,fs:: path filePath, string userName, fs::path storagePath)
 {
 	sqlite3* db;
 	char* zErrMsg = 0;
@@ -25,7 +101,7 @@ namespace fs = std::filesystem;
 			tmpPath.erase(i, storagePath.string().length());
 		}
 	
-		std::replace(tmpPath.begin(), tmpPath.end(), '\\', '/'); // replace all 'x' to 'y'
+		std::replace(tmpPath.begin(), tmpPath.end(), '\\', '/');
 
 	/* Open database */
 	rc = sqlite3_open("binPacking.db", &db);

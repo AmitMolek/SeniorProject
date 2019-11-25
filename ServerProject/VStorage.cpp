@@ -2,14 +2,14 @@
 #include "VStorageHelper.h"
 
 VStorage::VStorage(fs::path _rootPath, unsigned long long int _capacity, unsigned int _containersCount) : 
-	StorageObject(_rootPath, _capacity), containers() {
+	StorageObject(_rootPath), containers() {
 	containersCount = _containersCount;
 }
 
 void VStorage::CreateContainers(std::vector<VContainer>& _containers, unsigned int count) {
 	std::vector<fs::path> paths = VStorageHelper::GetSerialPaths(GetPath(), count);
 	for (fs::path p : paths){
-		VContainer cont(p, 1000);
+		VContainer cont(p, 1000, 0, this);
 		_containers.push_back(std::move(cont));
 	}
 }

@@ -11,15 +11,11 @@
 
 namespace fs = std::filesystem;
 
-class VFile {
+class VFile : public StorageObject{
 public:
-	StorageObject* parent;
-	fs::path rootPath;
 	std::ofstream fileStream;
-
 	std::string fileName;
 	unsigned long long int fileSize;
-
 	std::stringstream fileBuffer;
 
 	VFile();

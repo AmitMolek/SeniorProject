@@ -31,7 +31,6 @@
     <ClCompile Include="StorageObject.cpp" />
     <ClCompile Include="VContainer.cpp" />
     <ClCompile Include="VFile.cpp" />
-    <ClCompile Include="VFolder.cpp" />
     <ClCompile Include="VStorage.cpp" />
     <ClCompile Include="VStorageHelper.cpp" />
   </ItemGroup>
@@ -49,7 +48,6 @@
     <ClInclude Include="sqlite3ext.h" />
     <ClInclude Include="VContainer.h" />
     <ClInclude Include="VFile.h" />
-    <ClInclude Include="VFolder.h" />
     <ClInclude Include="VStorage.h" />
     <ClInclude Include="VStorageHelper.h" />
   </ItemGroup>

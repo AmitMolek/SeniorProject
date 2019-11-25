@@ -20,9 +20,9 @@ namespace client
         private String serverAddress;
         private int dataPort;
         private int instructionPort;
+        private String userName;
 
-
-        public BaseClient(String _serverAddress, int _dataPort, int _instructionPort,string userName)
+        public BaseClient(String _serverAddress, int _dataPort, int _instructionPort,string _userName)
         {
            
             dataSocket = null;
@@ -31,20 +31,21 @@ namespace client
             serverAddress = _serverAddress;
             dataPort = _dataPort;
             instructionPort = _instructionPort;
-
+            userName = _userName;
 
             GetInstructionSocket();
 
 
             GetDataSocket();
 
-            Thread t = new Thread(connectClient);
+            Thread t = new Thread(()=>connectClient());
+            t.IsBackground = true;
             t.Start();
 
             
-           Thread.Sleep(3000);
+           //Thread.Sleep(3000);
             
-            sendUserName(userName);
+            //sendUserName(userName);
             //ConnectDataSocket();
 
             // while (true) ;
@@ -213,6 +214,8 @@ namespace client
 
                                         }
                                     }
+
+                                    sendUserName(userName);
                                 }
                             }
                         }
