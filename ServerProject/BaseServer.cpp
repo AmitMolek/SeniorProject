@@ -158,6 +158,7 @@ void Thread_HandleClient(SOCKET instructionSocket, string clientAddress, VStorag
 
 	pair<int, string> msgInfo;
 	while ((msgInfo = CommunicationHandler::ReceiveMsg(instructionSocket)).first != -1) {
+		if (msgInfo.first == 0) break;
 		string msg = msgInfo.second;
 		ConsoleOutput() << "[INFO]" << clientPrefix << " Sent: " << msg << "\n";
 
