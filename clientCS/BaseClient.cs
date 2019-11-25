@@ -6,6 +6,7 @@ using System.Threading;
 using System.Net.Sockets;
 using System.Net;
 using System.IO;
+using System.Diagnostics;
 namespace client
 {
 
@@ -42,6 +43,7 @@ namespace client
 
             
            Thread.Sleep(3000);
+            
             sendUserName(userName);
             //ConnectDataSocket();
 
@@ -133,7 +135,7 @@ namespace client
         {
             int receivedBytes = -1;
             int instructionBytesCounter = 0;
-            byte [] instructionBuffer = new byte[INSTRUCTION_BUFFER_SIZE];
+            
             
 
 
@@ -146,75 +148,78 @@ namespace client
 
             string receivedMsg = ""; /* will be in use to savethe whole msg*/
 
-            
-            
-            while (instructionSocket.Available > 0)
+
+            while (true)
             {
-                receivedBytes = instructionSocket.Receive(instructionBuffer, instructionBuffer.Length, 0);
-                Console.WriteLine("start reading instruction");
-                instructionBytesCounter += receivedBytes;
-                receivedMsg += instructionBuffer;/* will be in use to savethe whole msg*/
-
-                string converted = Encoding.UTF8.GetString(instructionBuffer, 0, instructionBytesCounter);
-                Console.WriteLine("Msg: {0}" , converted);
-
-                string[] splitMsg = converted.Split('|');
-
-                foreach (string instruction in splitMsg)
+                instructionBytesCounter = 0;
+                while (instructionSocket.Available > 0)
                 {
-                    string[] splitInstructions = instruction.Split(':');
-                    if (splitInstructions.Length > 0)
+                    byte[] instructionBuffer = new byte[INSTRUCTION_BUFFER_SIZE];
+                    receivedBytes = instructionSocket.Receive(instructionBuffer, instructionBuffer.Length, 0);
+                    Debug.WriteLine("start reading instruction");
+                    instructionBytesCounter += receivedBytes;
+                    receivedMsg += instructionBuffer;/* will be in use to savethe whole msg*/
+
+                    string converted = Encoding.UTF8.GetString(instructionBuffer, 0, receivedBytes);
+                    Console.WriteLine(" line 162 Msg: {0}", converted);
+
+                    string[] splitMsg = converted.Split('|');
+
+                    foreach (string instruction in splitMsg)
                     {
-                        if (splitInstructions[0] == "pass")
+                        string[] splitInstructions = instruction.Split(':');
+                        if (splitInstructions.Length > 0)
                         {
-                            Console.WriteLine("splitInstructions[0] == \"pass\"");
-
-                            if (splitInstructions[1] == "instruction_socket")
+                            if (splitInstructions[0] == "pass")
                             {
-                                instructionSocketFd = splitInstructions[2];
+                                Console.WriteLine("splitInstructions[0] == \"pass\"");
 
-                                
-                                IPAddress addr = null;
-                                IPEndPoint ep = null;
-
-                                addr = IPAddress.Parse(serverAddress);
-                                ep = new IPEndPoint(addr, this.dataPort);
-                                this.dataSocket.Connect(ep);
-
-                                Thread.Sleep(3000);
-                                while (dataSocket.Available > 0)
+                                if (splitInstructions[1] == "instruction_socket")
                                 {
-                                    receivedBytes = dataSocket.Receive(dataBuffer, dataBuffer.Length, 0);
-
-                                    Console.WriteLine("start reading data");
-                                    dataBytesCounter += receivedBytes;
-                                    receivedMsg += dataBuffer;/* will be in use to savethe whole msg*/
-
-                                    converted = Encoding.UTF8.GetString(dataBuffer, 0, dataBytesCounter);
-                                    Console.WriteLine(" data Msg: {0}", converted);
-                                    string[] splitData = converted.Split(':');
+                                    instructionSocketFd = splitInstructions[2];
 
 
-                                    if (splitData[1] == "data_socket")
+                                    IPAddress addr = null;
+                                    IPEndPoint ep = null;
+
+                                    addr = IPAddress.Parse(serverAddress);
+                                    ep = new IPEndPoint(addr, this.dataPort);
+                                    this.dataSocket.Connect(ep);
+
+                                    while (dataSocket.Available <= 0) ;
+                                    while (dataSocket.Available > 0)
                                     {
-                                        dataSocketFd = splitData[2];
+                                        receivedBytes = dataSocket.Receive(dataBuffer, dataBuffer.Length, 0);
 
-                                        Console.WriteLine("Instruction Socket = {0}", instructionSocketFd);
-                                        Console.WriteLine("data Socket = {0}", dataSocketFd);
+                                        Console.WriteLine("start reading data");
+                                        dataBytesCounter += receivedBytes;
+                                        receivedMsg += dataBuffer;/* will be in use to savethe whole msg*/
 
-                                        string dataSocketIdMsg = "|pass:data_socket_id:" + dataSocketFd;
-                                        instructionSocket.Send(Encoding.ASCII.GetBytes(dataSocketIdMsg), 0);
+                                        converted = Encoding.UTF8.GetString(dataBuffer, 0, dataBytesCounter);
+                                        Console.WriteLine(" data Msg: {0}", converted);
+                                        string[] splitData = converted.Split(':');
 
 
+                                        if (splitData[1] == "data_socket")
+                                        {
+                                            dataSocketFd = splitData[2];
+
+                                            Console.WriteLine("Instruction Socket = {0}", instructionSocketFd);
+                                            Console.WriteLine("data Socket = {0}", dataSocketFd);
+
+                                            string dataSocketIdMsg = "|pass:data_socket_id:" + dataSocketFd;
+                                            instructionSocket.Send(Encoding.ASCII.GetBytes(dataSocketIdMsg), 0);
+
+
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-                }
-               
-            }
 
+                }
+            }
             Console.WriteLine("end reading instruction");
         }
         public void sendFile(String fileName)
@@ -229,9 +234,6 @@ namespace client
             splitMsg = fileName.Split('\\');
             Console.WriteLine((string)("|pass:file_send:" + splitMsg [splitMsg.Length-1] + "," + fileSize));
             instructionSocket.Send(Encoding.ASCII.GetBytes((string)("|pass:file_send:" + splitMsg[splitMsg.Length - 1] + "," + fileSize)),0);
-
-
-            
 
             FileStream input = File.OpenRead(fileName);
             dataSocket.Send(Encoding.ASCII.GetBytes("|pass:file_start"), 0);
