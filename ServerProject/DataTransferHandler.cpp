@@ -11,10 +11,14 @@
 
 #include <sstream>
 #include "dbHandler.h"
+
+
+#include <boost/algorithm/string/replace.hpp>
 using namespace std;
 
 namespace fs = filesystem;
-
+namespace db = dbHandler;
+namespace bo = boost;
 void DataTransferHandler::Thread_GetData(ConnectionInfo* con, FileUploadInfo fileInfo) {
 	std::pair<int, string> msgInfo;
 
@@ -28,12 +32,15 @@ void DataTransferHandler::Thread_GetData(ConnectionInfo* con, FileUploadInfo fil
 	fs::create_directories(testFilePath);
 	testFilePath /= fileInfo.fileName;
 
-	//dbHandler::addFileToDB(fileInfo.fileName,"",con->username);
 
 	VFile outFile;
 	con->storage->AllocateFile(outFile, fileInfo);
+	
 
-	ConsoleOutput() << outFile << "\n";
+	
+	db::addFileToDB(outFile.fileName, outFile.rootPath,con->username,con->storage);
+
+	ConsoleOutput() << outFile << "\n" ;
 
 	ConsoleOutput() << "[INFO][" << con->clientAddress << "] Started handling client file " << fileInfo.fileName << "\n";
 	CommunicationHandler::SendBasicMsg(*con->instructionSocket, "|pass:server_wait_on_file");
