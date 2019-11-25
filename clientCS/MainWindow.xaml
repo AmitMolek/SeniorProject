@@ -26,6 +26,8 @@
         <Button x:Name="btnBrowse" Content="Browse" HorizontalAlignment="Left" Margin="400,37,0,0" VerticalAlignment="Top" Grid.Row="1" Click="btnBrowse_Click" />
         <TextBox x:Name="txtPath" HorizontalAlignment="Left" Height="20" Margin="138,37,0,0" Text="TextBox" TextWrapping="NoWrap" VerticalAlignment="Top" Width="247" Grid.Row="1" AllowDrop="True" PreviewDragLeave="TextBox_Leave" PreviewDragEnter="TextBox_DragEnter" PreviewDragOver="TextBox_DragEnter" PreviewDrop="TextBox_Drop"/>
         <Button x:Name="btnUpload" Content="Upload" HorizontalAlignment="Left" Margin="219,75,0,0" VerticalAlignment="Top" Grid.Row="1" Click="btnSendFile_Click"/>
+        <TextBox x:Name="txtUserName" HorizontalAlignment="Left" Height="23" Margin="219,31,0,0" TextWrapping="Wrap" Text="userName" VerticalAlignment="Top" Width="120"/>
+        <Label x:Name="label1" Content="username" HorizontalAlignment="Left" Margin="156,28,0,0" VerticalAlignment="Top" Width="113"/>
 
     </Grid>
 </Window>

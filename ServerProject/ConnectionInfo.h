@@ -11,6 +11,7 @@ public:
 	SOCKET* dataSocket;
 	std::string clientAddress;
 	VStorage* storage;
+	std::string username;
 
 	ConnectionInfo() = delete;
 	ConnectionInfo(SOCKET* _instructionSocket, 
