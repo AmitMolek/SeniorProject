@@ -81,6 +81,9 @@
     <ClCompile Include="dbHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="StorageObject.cpp">
+      <Filter>Source Files\Storage</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -118,6 +121,9 @@
     </ClInclude>
     <ClInclude Include="ConnectionInfo.h">
       <Filter>Header Files\Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="StorageObject.h">
+      <Filter>Header Files\Storage</Filter>
     </ClInclude>
     <ClInclude Include="sqlite3.h">
       <Filter>Header Files</Filter>

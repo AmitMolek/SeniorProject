@@ -1,5 +1,7 @@
 #pragma once
 
+#include "StorageObject.h"
+
 #include <fstream>
 #include <sstream>
 #include <ostream>
@@ -11,6 +13,7 @@ namespace fs = std::filesystem;
 
 class VFile {
 public:
+	StorageObject* parent;
 	fs::path rootPath;
 	std::ofstream fileStream;
 
@@ -22,7 +25,8 @@ public:
 	VFile();
 	VFile(const VFile& other) = delete;
 	VFile(VFile&& other) noexcept;
-	VFile(fs::path _rootPath, std::string _fileName, unsigned long long int _fileSize);
+	VFile(fs::path _rootPath, std::string _fileName, 
+		  unsigned long long int _fileSize, StorageObject* _parent = nullptr);
 
 	VFile& operator << (std::string _str);
 	friend std::ostream& operator << (std::ostream& out, const VFile& obj);

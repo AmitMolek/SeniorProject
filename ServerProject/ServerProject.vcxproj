@@ -28,6 +28,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="dbHandler.cpp" />
     <ClCompile Include="sqlite3.c" />
+    <ClCompile Include="StorageObject.cpp" />
     <ClCompile Include="VContainer.cpp" />
     <ClCompile Include="VFile.cpp" />
     <ClCompile Include="VFolder.cpp" />
@@ -43,6 +44,7 @@
     <ClInclude Include="dbHandler.h" />
     <ClInclude Include="InstructionHandler.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="StorageObject.h" />
     <ClInclude Include="sqlite3.h" />
     <ClInclude Include="sqlite3ext.h" />
     <ClInclude Include="VContainer.h" />

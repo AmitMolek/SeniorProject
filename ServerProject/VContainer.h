@@ -1,22 +1,21 @@
 #pragma once
 
-#include "VFolder.h"
+#include "VFile.h"
+#include "StorageObject.h"
 
 #include <vector>
 #include <filesystem>
 
 namespace fs = std::filesystem;
 
-class VContainer {
+class VContainer : public StorageObject{
 public:
-	fs::path rootPath;
-	unsigned long long int capacity;
 	bool isContainerClosed;
 	std::vector<VFile> files;
 
 	VContainer(const VContainer& other) = delete;
-	VContainer(VContainer&& other);
-	VContainer(fs::path _rootPath, unsigned long long int _capacity);
+	VContainer(VContainer&& other) noexcept;
+	VContainer(fs::path _rootPath, unsigned long long int _capacity, StorageObject* _parent = nullptr);
 
 	// Opens the container
 	void OpenContainer();
