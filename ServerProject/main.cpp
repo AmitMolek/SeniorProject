@@ -11,8 +11,16 @@
 #include "VFile.h"
 #include "FileUploadInfo.h"
 
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <iostream>
+
 #define INSTRUCTION_PORT "23456"
 #define DATA_PORT "23457"
+
+
+
 
 int main() {
 	SocketHelper::InitWinSock();
@@ -22,6 +30,8 @@ int main() {
 	VStorage virtualStorage(virtualStorageRoot, 1024, 4);
 	BaseServer bs{INSTRUCTION_PORT, DATA_PORT, virtualStorage};
 	
+
+
 	while (true);
 
 	//FileUploadInfo fileInfo("gay.txt", 500);

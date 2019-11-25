@@ -10,7 +10,7 @@
 #include <boost/algorithm/string.hpp>
 
 #include <sstream>
-
+#include "dbHandler.h"
 using namespace std;
 
 namespace fs = filesystem;
@@ -27,6 +27,8 @@ void DataTransferHandler::Thread_GetData(ConnectionInfo* con, FileUploadInfo fil
 	testFilePath = testPath;
 	fs::create_directories(testFilePath);
 	testFilePath /= fileInfo.fileName;
+
+	//dbHandler::addFileToDB(fileInfo.fileName,"",con->username);
 
 	VFile outFile;
 	con->storage->AllocateFile(outFile, fileInfo);

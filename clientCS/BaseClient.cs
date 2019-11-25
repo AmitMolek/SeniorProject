@@ -21,7 +21,7 @@ namespace client
         private int instructionPort;
 
 
-        public BaseClient(String _serverAddress, int _dataPort, int _instructionPort)
+        public BaseClient(String _serverAddress, int _dataPort, int _instructionPort,string userName)
         {
            
             dataSocket = null;
@@ -40,7 +40,9 @@ namespace client
             Thread t = new Thread(connectClient);
             t.Start();
 
-            //Sleep(3000);
+            
+           Thread.Sleep(3000);
+            sendUserName(userName);
             //ConnectDataSocket();
 
             // while (true) ;
@@ -229,7 +231,7 @@ namespace client
             instructionSocket.Send(Encoding.ASCII.GetBytes((string)("|pass:file_send:" + splitMsg[splitMsg.Length - 1] + "," + fileSize)),0);
 
 
-           
+            
 
             FileStream input = File.OpenRead(fileName);
             dataSocket.Send(Encoding.ASCII.GetBytes("|pass:file_start"), 0);
@@ -243,6 +245,12 @@ namespace client
             }
             dataSocket.Send(Encoding.ASCII.GetBytes("|pass:file_end"), 0);
             input.Close();
+        }
+
+        public void sendUserName(string userName)
+        {
+            instructionSocket.Send(Encoding.ASCII.GetBytes((string)("|pass:user_name:" + userName)));
+           
         }
     }
 

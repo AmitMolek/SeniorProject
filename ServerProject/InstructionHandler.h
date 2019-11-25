@@ -13,5 +13,6 @@ private:
 
 	static void Handle_Pass_data_socket_id(Instruction ins, ConnectionInfo& con);
 	static void Handle_Pass_file_send(Instruction ins, ConnectionInfo& con);
+	static void Handle_Pass_user_name(Instruction ins, ConnectionInfo& con);
 };
 

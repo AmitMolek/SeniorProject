@@ -2,6 +2,8 @@
 
 #include "VStorage.h"
 #include <WinSock2.h>
+#include "sqlite3.h"
+
 
 class BaseServer {
 public:
@@ -15,6 +17,8 @@ public:
 	PCSTR instructionPort;
 
 	VStorage& storage;
+
+	sqlite3* db;
 
 	BaseServer(PCSTR _dataPort, PCSTR _instructionPort, VStorage& _storage);
 

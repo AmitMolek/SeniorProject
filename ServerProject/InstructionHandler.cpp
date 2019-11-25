@@ -27,6 +27,11 @@ void InstructionHandler::Handle_Pass(Instruction ins, ConnectionInfo& con){
 	}else if (ins.code == "file_send"){
 		InstructionHandler::Handle_Pass_file_send(ins, con);
 	}
+	else if ((ins.code == "user_name"))
+	{
+		InstructionHandler::Handle_Pass_user_name(ins, con);
+	}
+	
 }
 
 void InstructionHandler::Handle_Fail(Instruction ins, ConnectionInfo& con){
@@ -49,4 +54,10 @@ void InstructionHandler::Handle_Pass_file_send(Instruction ins, ConnectionInfo& 
 
 	std::thread dataTransferThread(DataTransferHandler::Thread_GetData, &con, fileInfo);
 	dataTransferThread.detach();
+}
+void InstructionHandler::Handle_Pass_user_name(Instruction ins, ConnectionInfo& con) {
+	string userName = ins.content[0];
+	con.username = userName;
+
+	
 }
