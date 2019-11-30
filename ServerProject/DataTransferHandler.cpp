@@ -71,6 +71,12 @@ void DataTransferHandler::Thread_GetData(ConnectionInfo* con, FileUploadInfo fil
 			outFile.CloseFileStream();
 			db::Database::Instance() << make_pair(&outFile, con);
 			ConsoleOutput() << "[INFO][" << con->clientAddress << "] Closed file " << fileInfo.fileName << "\n";
+			
+			fs::path parentPath = outFile.GetPath().parent_path();
+			fs::path VContainerName = parentPath.filename();
+			string st = VContainerName.string();
+			
+			db::Database::Instance().updateVcontainerUsedCapacity(st, outFile.fileSize);
 			break;
 		}
 	}

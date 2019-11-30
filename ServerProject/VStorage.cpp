@@ -1,6 +1,8 @@
 #include "VStorage.h"
 #include "VStorageHelper.h"
+#include "dbHandler.h"
 
+namespace db = dbHandler;
 VStorage::VStorage(fs::path _rootPath, unsigned long long int _capacity, unsigned int _containersCount) : 
 	StorageObject(_rootPath), containers() {
 	containersCount = _containersCount;
@@ -10,6 +12,7 @@ void VStorage::CreateContainers(std::vector<VContainer>& _containers, unsigned i
 	std::vector<fs::path> paths = VStorageHelper::GetSerialPaths(GetPath(), count);
 	for (fs::path p : paths){
 		VContainer cont(p, 1000, 0, this);
+		db::Database::Instance() << &cont;
 		_containers.push_back(std::move(cont));
 	}
 }
