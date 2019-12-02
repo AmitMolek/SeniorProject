@@ -15,14 +15,14 @@ class VFile : public StorageObject{
 public:
 	std::ofstream fileStream;
 	std::string fileName;
-	unsigned long long int fileSize;
+	uint64_t fileSize;
 	std::stringstream fileBuffer;
 
 	VFile();
 	VFile(const VFile& other) = delete;
 	VFile(VFile&& other) noexcept;
 	VFile(fs::path _rootPath, std::string _fileName, 
-		  unsigned long long int _fileSize, StorageObject* _parent = nullptr);
+		  uint64_t _fileSize, StorageObject* _parent = nullptr);
 
 	VFile& operator << (std::string _str);
 	friend std::ostream& operator << (std::ostream& out, const VFile& obj);

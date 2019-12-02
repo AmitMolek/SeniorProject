@@ -13,7 +13,7 @@ VFile::VFile(VFile&& other) noexcept :
 }
 
 VFile::VFile(fs::path _rootPath, std::string _fileName, 
-			 unsigned long long int _fileSize, StorageObject* _parent) : 
+			 uint64_t _fileSize, StorageObject* _parent) :
 	fileBuffer(), StorageObject(_rootPath, _parent) {
 	fileName = _fileName;
 	fileSize = _fileSize;
@@ -50,8 +50,6 @@ void VFile::OpenFileStream() {
 void VFile::CloseFileStream(){
 	SaveFileStream();
 	fileStream.close();
-	if (GetParent() != nullptr)
-		((VContainer*)GetParent())->UseCapacity(fileBuffer.str().size());
 }
 
 void VFile::SaveFileStream() {

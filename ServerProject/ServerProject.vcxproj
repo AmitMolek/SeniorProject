@@ -19,14 +19,17 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Allocator.cpp" />
     <ClCompile Include="BaseServer.cpp" />
     <ClCompile Include="CommunicationHandler.cpp" />
     <ClCompile Include="ConnectionInfo.cpp" />
     <ClCompile Include="ConsoleOutput.cpp" />
     <ClCompile Include="DataTransferHandler.cpp" />
+    <ClCompile Include="FirstFit.cpp" />
     <ClCompile Include="InstructionHandler.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="dbHandler.cpp" />
+    <ClCompile Include="NextFit.cpp" />
     <ClCompile Include="sqlite3.c" />
     <ClCompile Include="StorageObject.cpp" />
     <ClCompile Include="VContainer.cpp" />
@@ -35,13 +38,17 @@
     <ClCompile Include="VStorageHelper.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Allocator.h" />
     <ClInclude Include="BaseServer.h" />
     <ClInclude Include="CommunicationHandler.h" />
     <ClInclude Include="ConnectionInfo.h" />
     <ClInclude Include="ConsoleOutput.h" />
     <ClInclude Include="DataTransferHandler.h" />
     <ClInclude Include="dbHandler.h" />
+    <ClInclude Include="FirstFit.h" />
+    <ClInclude Include="IBPAlgorithm.h" />
     <ClInclude Include="InstructionHandler.h" />
+    <ClInclude Include="NextFit.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="StorageObject.h" />
     <ClInclude Include="sqlite3.h" />

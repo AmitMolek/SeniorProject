@@ -11,15 +11,15 @@ namespace fs = std::filesystem;
 class VContainer : public StorageObject{
 public:
 	bool isContainerClosed;
-	unsigned long long int capacity;
-	unsigned long long int usedCapacity;
+	uint64_t capacity;
+	uint64_t usedCapacity;
 	std::vector<VFile> files;
 
 	VContainer(const VContainer& other) = delete;
 	VContainer(VContainer&& other) noexcept;
 	VContainer(fs::path _rootPath, 
-			   unsigned long long int _capacity, 
-			   unsigned long long int _usedCapacity = 0, 
+			   uint64_t _capacity, 
+			   uint64_t _usedCapacity = 0,
 			   StorageObject* _parent = nullptr);
 
 	// Opens the container
@@ -29,14 +29,14 @@ public:
 	// Creates the folder if it doesnt exists
 	bool CreateContainerFolder();
 
-	unsigned long long int GetTotalCapacity();
-	unsigned long long int GetFreeCapacity();
-	unsigned long long int GetUsedCapacity();
+	uint64_t GetTotalCapacity();
+	uint64_t GetFreeCapacity();
+	uint64_t GetUsedCapacity();
 
-	void SetTotalCapacity(unsigned long long int _capacity);
-	void SetUsedCapacity(unsigned long long int _usedCapacity);
+	void SetTotalCapacity(uint64_t _capacity);
+	void SetUsedCapacity(uint64_t _usedCapacity);
 
-	bool CanStore(unsigned long long int toStore);
-	bool UseCapacity(unsigned long long toUse);
+	bool CanStore(uint64_t toStore);
+	bool UseCapacity(uint64_t toUse);
 };
 

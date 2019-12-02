@@ -9,8 +9,8 @@ VContainer::VContainer(VContainer&& other) noexcept :
 }
 
 VContainer::VContainer(fs::path _rootPath,
-		   unsigned long long int _capacity,
-		   unsigned long long int _usedCapacity,
+		   uint64_t _capacity,
+		   uint64_t _usedCapacity,
 		   StorageObject* _parent) : StorageObject(_rootPath, _parent), files(){
 	capacity = _capacity;
 	usedCapacity = _usedCapacity;
@@ -32,31 +32,31 @@ bool VContainer::CreateContainerFolder() {
 	} else return true;
 }
 
-unsigned long long int VContainer::GetTotalCapacity() {
+uint64_t VContainer::GetTotalCapacity() {
 	return capacity;
 }
 
-unsigned long long int VContainer::GetFreeCapacity() {
+uint64_t VContainer::GetFreeCapacity() {
 	return (GetTotalCapacity() - GetUsedCapacity());
 }
 
-unsigned long long int VContainer::GetUsedCapacity() {
+uint64_t VContainer::GetUsedCapacity() {
 	return usedCapacity;
 }
 
-void VContainer::SetTotalCapacity(unsigned long long int _capacity) {
+void VContainer::SetTotalCapacity(uint64_t _capacity) {
 	capacity = _capacity;
 }
 
-void VContainer::SetUsedCapacity(unsigned long long int _usedCapacity) {
+void VContainer::SetUsedCapacity(uint64_t _usedCapacity) {
 	usedCapacity = _usedCapacity;
 }
 
-bool VContainer::CanStore(unsigned long long int toStore) {
+bool VContainer::CanStore(uint64_t toStore) {
 	return (GetTotalCapacity() > (GetUsedCapacity() + toStore)) ? true : false;
 }
 
-bool VContainer::UseCapacity(unsigned long long toUse) {
+bool VContainer::UseCapacity(uint64_t toUse) {
 	if (CanStore(toUse)) {
 		usedCapacity += toUse;
 		return true;
