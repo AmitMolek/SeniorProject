@@ -56,7 +56,8 @@ bool dbh::Database::ExecQuery(std::string query){
 bool dbh::Database::StoreFile(std::string fileName, 
 							 fs::path filePath, 
 							 std::string userName, 
-							 fs::path storagePath){
+							 fs::path storagePath,
+							 uint64_t fileSize){
 	std::string tmpPath = filePath.string();
 	std::string::size_type i = tmpPath.find(storagePath.string());
 	if (i != std::string::npos) {
@@ -65,8 +66,8 @@ bool dbh::Database::StoreFile(std::string fileName,
 
 	std::replace(tmpPath.begin(), tmpPath.end(), '\\', '/');
 
-	std::string sql = "INSERT INTO files (fileName,folder,owner)"\
-		"VALUES ( '" + fileName + "','" + tmpPath + "', '" + userName + "');";
+	std::string sql = "INSERT INTO files (fileName,folder,owner,size)"\
+		"VALUES ( '" + fileName + "','" + tmpPath + "', '" + userName + "','"+ to_string(fileSize) +"');";
 
 	return dbh::Database::ExecQuery(sql);
 }
@@ -83,7 +84,7 @@ void dbHandler::operator<<(Database& out, std::pair<VFile*, ConnectionInfo*> upl
 	VFile* file = uploadInfo.first;
 	ConnectionInfo* con = uploadInfo.second;
 
-	out.StoreFile(file->fileName, file->GetPath(), con->username, con->storage->GetPath());
+	out.StoreFile(file->fileName, file->GetPath(), con->username, con->storage->GetPath(),file->fileSize);
 }
 /* not used */
 bool dbHandler::addFileToDB(string fileName,fs:: path filePath, string userName, fs::path storagePath)
@@ -155,6 +156,46 @@ int dbHandler::Database::updateVcontainerUsedCapacity(std::string containerName,
 }
 
 
+// This is the callback function to set the param to the value
+static int retrieveFiles_callback(void* param, int argc, char** argv, char** azColName)
+{
+	if (argc == 0) return 0;
+	
+
+	
+	return 0;
+}
+
+bool retrieveFiles(std::vector<VFile>& files, std::string folderName)
+{
+	
+
+	std::string sql = "SELECT * FROM files WHERE folder = " + folderName + ";";
+	int rc = sqlite3_exec(dbh::Database::Instance().db, sql.c_str(), retrieveFiles_callback, &files, NULL);
+	
+	return 0;
+}
 
 
+
+static int retrieveContainers_callback(void* param, int argc, char** argv, char** azColName)
+{
+	if (argc == 0) return 0;
+	for (int i = 0; i < 4; i++) 
+	{
+		cout << azColName[i] << " " << argv[i];
+	}
+	
+
+
+	return 0;
+}
+
+bool dbh::Database::retrieveContainers(std::vector<VContainer>& containersVector)
+{
+	std::string sql = "SELECT * FROM containers;";
+	int rc = sqlite3_exec(dbh::Database::Instance().db, sql.c_str(), retrieveContainers_callback, &containersVector, NULL);
+
+	return true;
+}
 
