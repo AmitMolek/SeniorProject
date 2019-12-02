@@ -37,6 +37,7 @@ namespace dbHandler {
 		friend void operator << (Database& out, std::pair<VFile*, ConnectionInfo*> uploadInfo);
 		//bool retrieveFiles(std::vector<VFile>& files, std::string folderName);
 		bool retrieveContainers(std::vector<VContainer>& containersVector);
+		bool retrieveFiles(VContainer& parent, std::vector<VFile>* files, std::string folderName);
 	};
 	bool addFileToDB(std::string fileName, std::filesystem::path filePath,std:: string userName, std::filesystem::path storagePath);
 	void operator<<(Database& out, VContainer* container);

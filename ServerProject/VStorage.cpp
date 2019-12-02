@@ -38,9 +38,10 @@ void VStorage::CreateContainer(unsigned int id, uint64_t _capacity, StorageObjec
 }
 
 void VStorage::CreateContainers(std::vector<VContainer>& _containers, unsigned int count) {
-	for (unsigned int i = 0; i < count; i++) {
+	db::Database::Instance().retrieveContainers(_containers);
+	/*for (unsigned int i = 0; i < count; i++) {
 		CreateContainer(i, (unsigned)(CONTAINER_SIZE), this);
-	}
+	}*/
 }
 
 void VStorage::AllocateFiles(std::vector<std::pair<VFile&, FileUploadInfo&>> files) {
@@ -81,14 +82,14 @@ void VStorage::AllocateFiles(std::vector<std::pair<VFile&, FileUploadInfo&>> fil
 	}
 }
 
-void VStorage::AllocateFile(VFile& vFile, FileUploadInfo& _fileInfo){
-	CreateContainers(containers, 3);
-
-	fs::path filePath = containers[0].GetPath();
-	filePath /= _fileInfo.fileName;
-
-	vFile = VFile(filePath, _fileInfo.fileName, _fileInfo.fileSize);
-}
+//void VStorage::AllocateFile(VFile& vFile, FileUploadInfo& _fileInfo){
+//	CreateContainers(containers, 3);
+//
+//	fs::path filePath = containers[0].GetPath();
+//	filePath /= _fileInfo.fileName;
+//
+//	vFile = VFile(filePath, _fileInfo.fileName, _fileInfo.fileSize);
+//}
 
 void VStorage::CreatePathFolders() {
 	if (!fs::exists(GetPath()))
