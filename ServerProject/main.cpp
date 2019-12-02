@@ -18,6 +18,7 @@ int main() {
 	unsigned int numOfContainers = 1;
 	FirstFit ff;
 	VStorage virtualStorage(virtualStorageRoot, numOfContainers, {&ff});
+
 	BaseServer bs{INSTRUCTION_PORT, DATA_PORT, virtualStorage};
 	
 	while (true);

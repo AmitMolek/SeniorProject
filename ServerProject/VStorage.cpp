@@ -27,7 +27,7 @@ void VStorage::CreateContainer(unsigned int id, uint64_t _capacity, StorageObjec
 	cont.SetTotalCapacity(_capacity);
 	cont.SetUsedCapacity(0);
 	cont.SetParent(parent);
-
+	
 	fs::create_directory(cont.GetPath());
 	db::Database::Instance() << &cont;
 	containers.push_back(std::move(cont));
@@ -35,9 +35,10 @@ void VStorage::CreateContainer(unsigned int id, uint64_t _capacity, StorageObjec
 }
 
 void VStorage::CreateContainers(std::vector<VContainer>& _containers, unsigned int count) {
-	for (int i = 0; i < count; i++) {
-		CreateContainer(i, (unsigned)(CONTAINER_SIZE), this);
-	}
+	db::Database::Instance().retrieveContainers(_containers);
+	//for (int i = 0; i < count; i++) {
+	//	CreateContainer(i, (unsigned)(CONTAINER_SIZE), this);
+	//}
 }
 
 void VStorage::AllocateFiles(std::vector<std::pair<VFile&, FileUploadInfo&>> files) {

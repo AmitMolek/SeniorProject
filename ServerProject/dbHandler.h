@@ -25,7 +25,7 @@ namespace dbHandler {
 		static void CloseDatabase();
 		static bool ExecQuery(std::string query);
 
-		static bool StoreFile(std::string fileName, fs::path filePath, std::string userName, fs::path storagePath);
+		static bool StoreFile(std::string fileName, fs::path filePath, std::string userName, fs::path storagePath,uint64_t fileSize);
 
 		bool InsertVContainer(std::string FolderName, uint64_t capacity, uint64_t usedCapacity);
 
@@ -35,6 +35,8 @@ namespace dbHandler {
 
 		friend void operator << (Database& out, const std::string query);
 		friend void operator << (Database& out, std::pair<VFile*, ConnectionInfo*> uploadInfo);
+		//bool retrieveFiles(std::vector<VFile>& files, std::string folderName);
+		bool retrieveContainers(std::vector<VContainer>& containersVector);
 	};
 	bool addFileToDB(std::string fileName, std::filesystem::path filePath,std:: string userName, std::filesystem::path storagePath);
 	void operator<<(Database& out, VContainer* container);
