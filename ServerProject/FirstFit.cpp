@@ -17,12 +17,3 @@ int FirstFit::RunAlgorithm(uint64_t fileSize, std::vector<VContainer>& container
 
 	return -1;
 }
-
-int FirstFit::RunAlgorithm(uint64_t fileSize, std::vector<uint64_t> freeCapacity) {
-	for (size_t i = 0; i < freeCapacity.size(); i++) {
-		if (fileSize <= freeCapacity[i])
-			return i;
-	}
-	
-	return -1;
-}

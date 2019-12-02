@@ -23,7 +23,3 @@ int NextFit::RunAlgorithm(uint64_t fileSize, std::vector<VContainer>& containers
 
 	return -1;
 }
-
-int NextFit::RunAlgorithm(uint64_t fileSize, std::vector<uint64_t> freeCapacity) {
-	return -1;
-}

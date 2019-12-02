@@ -165,7 +165,7 @@
       <Filter>Header Files\Algorithms</Filter>
     </ClInclude>
     <ClInclude Include="BestFit.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Algorithms</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
