@@ -5,6 +5,7 @@
 #include "IBPAlgorithm.h"
 #include "FirstFit.h"
 #include "NextFit.h"
+#include "BestFit.h"
 
 #define INSTRUCTION_PORT "23456"
 #define DATA_PORT "23457"
@@ -18,7 +19,8 @@ int main() {
 	unsigned int numOfContainers = 1;
 	FirstFit ff;
 	NextFit nf;
-	VStorage virtualStorage(virtualStorageRoot, numOfContainers, {/*&ff*/&nf});
+	BestFit bf;
+	VStorage virtualStorage(virtualStorageRoot, numOfContainers, {/*&ff&nf*/&bf});
 	BaseServer bs{INSTRUCTION_PORT, DATA_PORT, virtualStorage};
 	
 	while (true);

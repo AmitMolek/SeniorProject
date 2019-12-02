@@ -20,7 +20,7 @@ int BestFit::RunAlgorithm(uint64_t fileSize, std::vector<VContainer>& containers
 	for (size_t i = 0; i < containers.size(); i++) {
 		if (containers[i].CanStore(fileSize)) {
 			uint64_t minCapacityLeft = containers[i].GetTotalCapacity() - fileSize;
-			if (minSize < minCapacityLeft) {
+			if (minSize > minCapacityLeft) {
 				containerIndex = i;
 				minSize = minCapacityLeft;
 			}
