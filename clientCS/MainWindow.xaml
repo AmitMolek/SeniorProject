@@ -5,13 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:clientCS"
         mc:Ignorable="d"
-        Title="MainWindow" Height="244" Width="504.943">
-    <Grid>
+        Title="MainWindow" Height="180.8" Width="504.943">
+    <Grid Margin="0,0,0.4,0" Height="191" VerticalAlignment="Top">
         <Grid.RowDefinitions>
-            <RowDefinition Height="165*"/>
-            <RowDefinition Height="269*"/>
+            <RowDefinition Height="57*"/>
+            <RowDefinition Height="122*"/>
+            <RowDefinition Height="13*"/>
         </Grid.RowDefinitions>
-        <Button x:Name="btnConnect" Content="Connect" HorizontalAlignment="Left" Margin="359,20,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5" Height="40" Width="115" Click="btnConnect_Click" >
+        <Button x:Name="btnConnect" Content="Connect" HorizontalAlignment="Left" Margin="359,9,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5" Height="40" Width="115" Click="btnConnect_Click" >
             <Button.RenderTransform>
                 <TransformGroup>
                     <ScaleTransform/>
@@ -21,13 +22,13 @@
                 </TransformGroup>
             </Button.RenderTransform>
         </Button>
-        <Label x:Name="label" Content="Status:" HorizontalAlignment="Left" Height="31" Margin="198,26,0,0" VerticalAlignment="Top" Width="55"/>
-        <Label x:Name="lblConnectionStatus" Content="disconnected" HorizontalAlignment="Left" Margin="253,26,0,0" VerticalAlignment="Top"/>
-        <Button x:Name="btnBrowse" Content="Browse" HorizontalAlignment="Left" Margin="397,11.4,0,0" VerticalAlignment="Top" Click="btnBrowse_Click" Grid.Row="1" />
-        <TextBox x:Name="txtPath" HorizontalAlignment="Left" Height="20" Margin="135,10.4,0,0" Text="TextBox" TextWrapping="NoWrap" VerticalAlignment="Top" Width="247" AllowDrop="True" PreviewDragLeave="TextBox_Leave" PreviewDragEnter="TextBox_DragEnter" PreviewDragOver="TextBox_DragEnter" PreviewDrop="TextBox_Drop" Grid.Row="1"/>
-        <Button x:Name="btnUpload" Content="Upload" HorizontalAlignment="Left" Margin="175,50.4,0,0" VerticalAlignment="Top" Grid.Row="1" Click="btnSendFile_Click" Width="141"/>
-        <TextBox x:Name="txtUserName" HorizontalAlignment="Left" Height="23" Margin="77,30,0,0" TextWrapping="Wrap" Text="username" VerticalAlignment="Top" Width="110"/>
-        <Label x:Name="label1" Content="Username" HorizontalAlignment="Left" Margin="10,27,0,0" VerticalAlignment="Top" Width="67"/>
+        <Label x:Name="label" Content="Status:" HorizontalAlignment="Left" Height="23" Margin="198,15,0,0" VerticalAlignment="Top" Width="55"/>
+        <Label x:Name="lblConnectionStatus" Content="disconnected" HorizontalAlignment="Left" Margin="253,12,0,0" VerticalAlignment="Top" Height="26" Width="80"/>
+        <Button x:Name="btnBrowse" Content="Browse" HorizontalAlignment="Left" Margin="397,23.2,0,0" VerticalAlignment="Top" Click="btnBrowse_Click" Grid.Row="1" Height="19" Width="70" />
+        <TextBox x:Name="txtPath" Height="20" Margin="135,22.2,116,0" Text="TextBox" TextWrapping="NoWrap" VerticalAlignment="Top" AllowDrop="True" PreviewDragLeave="TextBox_Leave" PreviewDragEnter="TextBox_DragEnter" PreviewDragOver="TextBox_DragEnter" PreviewDrop="TextBox_Drop" Grid.Row="1"/>
+        <Button x:Name="btnUpload" Content="Upload" HorizontalAlignment="Left" Margin="178,56.2,0,0" VerticalAlignment="Top" Grid.Row="1" Click="btnSendFile_Click" Width="141" Height="19"/>
+        <TextBox x:Name="txtUserName" HorizontalAlignment="Left" Height="23" Margin="77,15,0,0" TextWrapping="Wrap" Text="username" VerticalAlignment="Top" Width="110"/>
+        <Label x:Name="label1" Content="Username" HorizontalAlignment="Left" Margin="10,12,0,0" VerticalAlignment="Top" Width="67" Height="26"/>
 
     </Grid>
 </Window>

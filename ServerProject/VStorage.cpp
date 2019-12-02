@@ -29,13 +29,14 @@ void VStorage::CreateContainer(unsigned int id, uint64_t _capacity, StorageObjec
 	cont.SetParent(parent);
 
 	fs::create_directory(cont.GetPath());
+	ConsoleOutput() << "[INFO] Created container " << cont.GetPrint() << "\n";
 	db::Database::Instance() << &cont;
 	containers.push_back(std::move(cont));
 	containersCount++;
 }
 
 void VStorage::CreateContainers(std::vector<VContainer>& _containers, unsigned int count) {
-	for (int i = 0; i < count; i++) {
+	for (unsigned int i = 0; i < count; i++) {
 		CreateContainer(i, (unsigned)(CONTAINER_SIZE), this);
 	}
 }
@@ -47,13 +48,19 @@ void VStorage::AllocateFiles(std::vector<std::pair<VFile&, FileUploadInfo&>> fil
 
 	IBPAlgorithm* algo = Allocator::GetStorageAlgorithm(algosPtr, files.size());
 	for(auto& pair : files){
-		std::vector<unsigned long long int> containersFreeCapacity;
+		std::vector<uint64_t> containersFreeCapacity;
 		for (VContainer& cont : containers) {
-			containersFreeCapacity.push_back(cont.GetFreeCapacity());
+			if (cont.GetTotalCapacity() >= pair.second.fileSize)
+				containersFreeCapacity.push_back(cont.GetFreeCapacity());
+		}
+		if (containersFreeCapacity.size() == 0){
+			ConsoleOutput() << "[INFO] File size cannot be stored " 
+				<< "[" << pair.second.fileName << "," << pair.second.fileSize << "]\n";
 		}
 
-		int contIndex = algo->RunAlgorithm(pair.second.fileSize, containersFreeCapacity);
-		std::cout << "[INFO] Container index = " << contIndex << "\n";
+		//int contIndex = algo->RunAlgorithm(pair.second.fileSize, containersFreeCapacity);
+		int contIndex = algo->RunAlgorithm(pair.second.fileSize, containers);
+
 		VContainer* parentCont;
 		if (contIndex > -1) {
 			parentCont = &containers[contIndex];
@@ -68,24 +75,9 @@ void VStorage::AllocateFiles(std::vector<std::pair<VFile&, FileUploadInfo&>> fil
 		pair.first.fileName = pair.second.fileName;
 		pair.first.fileSize = pair.second.fileSize;
 		parentCont->UseCapacity(pair.first.fileSize);
-		ConsoleOutput() << "Stored " << pair.first << " in container " << parentCont->GetPrint() << "\n";
+		ConsoleOutput() << "[INFO] Stored " << pair.first << " in container " << parentCont->GetPrint() << "\n";
 	}
 }
-
-//void VStorage::AllocateFiles(std::vector<std::pair<VFile&, FileUploadInfo&>> files) {
-//	CreateContainers(containers, 3);
-//
-//	std::vector<IBPAlgorithm*> algosPtr;
-//	for (IBPAlgorithm& algo : algorithms)
-//		algosPtr.push_back(&algo);
-//
-//	VContainer* cont = Allocator::AllocateContainer(files[0].second.fileSize, algosPtr, containers, files.size());
-//	for (auto& pair : files) {
-//		cont->UseCapacity(pair.second.fileSize);
-//		fs::path filePath = cont->GetPath();
-//		pair.first.SetPath(filePath);
-//	}
-//}
 
 void VStorage::AllocateFile(VFile& vFile, FileUploadInfo& _fileInfo){
 	CreateContainers(containers, 3);

@@ -5,6 +5,7 @@ class FirstFit : public IBPAlgorithm {
 public:
 	std::string GetName();
 	double CalculateMean(size_t input_length);
-	int RunAlgorithm(unsigned long long int fileSize, std::vector<unsigned long long int> freeCapacity);
+	int RunAlgorithm(uint64_t fileSize, std::vector<uint64_t> freeCapacity);
+	int RunAlgorithm(uint64_t fileSize, std::vector<VContainer>& containers);
 };
 
