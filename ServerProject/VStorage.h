@@ -28,6 +28,7 @@ public:
 	void AllocateFile(VFile& vFile, FileUploadInfo& _fileInfo);
 	void AllocateFiles(std::vector<std::pair<VFile&, FileUploadInfo&>> files);
 private:
+	void CreateContainer(unsigned int id, uint64_t _capacity, StorageObject* parent);
 	void CreateContainers(std::vector<VContainer>& _containers, unsigned int count);
 
 	void CreatePathFolders();

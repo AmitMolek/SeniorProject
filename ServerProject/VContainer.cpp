@@ -1,5 +1,7 @@
 #include "VContainer.h"
 
+VContainer::VContainer() : StorageObject("", nullptr), capacity(0), usedCapacity(0), files(){}
+
 VContainer::VContainer(VContainer&& other) noexcept :
 	StorageObject(std::move(other)), 
 	isContainerClosed(std::exchange(other.isContainerClosed, false)), 
@@ -15,6 +17,16 @@ VContainer::VContainer(fs::path _rootPath,
 	capacity = _capacity;
 	usedCapacity = _usedCapacity;
 	isContainerClosed = false;
+}
+
+std::ostream& operator << (std::ostream& out, VContainer& obj) {
+	out << "["
+		<< obj.GetPath() << ","
+		<< obj.GetTotalCapacity() << ","
+		<< obj.GetUsedCapacity() <<
+		"]";
+
+	return out;
 }
 
 void VContainer::OpenContainer(){
@@ -61,4 +73,15 @@ bool VContainer::UseCapacity(uint64_t toUse) {
 		usedCapacity += toUse;
 		return true;
 	} else return false;
+}
+
+std::string VContainer::GetPrint() {
+	std::string outputPrint;
+	outputPrint +=( "["
+		+ GetPath().string() + ","
+		+ std::to_string(GetTotalCapacity()) + ","
+		+ std::to_string(GetUsedCapacity()) +
+		"]");
+
+	return outputPrint;
 }

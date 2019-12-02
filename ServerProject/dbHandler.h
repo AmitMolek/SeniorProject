@@ -27,9 +27,9 @@ namespace dbHandler {
 
 		static bool StoreFile(std::string fileName, fs::path filePath, std::string userName, fs::path storagePath);
 
-		bool InsertVContainer(std::string FolderName, int capacity, int usedCapacity);
+		bool InsertVContainer(std::string FolderName, uint64_t capacity, uint64_t usedCapacity);
 
-		int  updateVcontainerUsedCapacity(std::string containerName,int usedAdded);
+		int  updateVcontainerUsedCapacity(std::string containerName, uint64_t usedAdded);
 
 		Database& operator () ();
 

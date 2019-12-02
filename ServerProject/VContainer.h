@@ -15,12 +15,15 @@ public:
 	uint64_t usedCapacity;
 	std::vector<VFile> files;
 
+	VContainer();
 	VContainer(const VContainer& other) = delete;
 	VContainer(VContainer&& other) noexcept;
 	VContainer(fs::path _rootPath, 
 			   uint64_t _capacity, 
 			   uint64_t _usedCapacity = 0,
 			   StorageObject* _parent = nullptr);
+
+	friend std::ostream& operator << (std::ostream& out, VContainer& obj);
 
 	// Opens the container
 	void OpenContainer();
@@ -38,5 +41,7 @@ public:
 
 	bool CanStore(uint64_t toStore);
 	bool UseCapacity(uint64_t toUse);
+
+	std::string GetPrint();
 };
 

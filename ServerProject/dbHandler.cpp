@@ -132,16 +132,12 @@ bool dbHandler::addFileToDB(string fileName,fs:: path filePath, string userName,
 
 /*operator << for insert new container*/
 void dbHandler::operator<<(Database& out, VContainer *container) {
-	
 	std::filesystem::path path = container->GetPath();
-
-	
-
 	out.InsertVContainer(path.filename().string(), container->GetTotalCapacity(), container->GetUsedCapacity());
 }
 bool dbh::Database::InsertVContainer(std::string FolderName,
-												int capacity,
-												int usedCapacity) {
+												uint64_t capacity,
+												uint64_t usedCapacity) {
 	
 	std::string sql = "INSERT INTO containers (Name,capacity,usedCapacity)"\
 		"VALUES ( '"+ FolderName +"','" + to_string(capacity) + "', '" + to_string(usedCapacity) + "');";
@@ -149,10 +145,7 @@ bool dbh::Database::InsertVContainer(std::string FolderName,
 	return dbh::Database::ExecQuery(sql);
 }
 
-
-
-
-int dbHandler::Database::updateVcontainerUsedCapacity(std::string containerName,int usedAdded)
+int dbHandler::Database::updateVcontainerUsedCapacity(std::string containerName, uint64_t usedAdded)
 {
 	std::string sql = "UPDATE containers SET usedCapacity = usedCapacity+" + to_string(usedAdded) +" WHERE name = " + containerName + ";";
 	int rc = sqlite3_exec(dbh::Database::Instance().db, sql.c_str(), NULL, NULL, NULL);

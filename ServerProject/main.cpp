@@ -15,7 +15,7 @@ int main() {
 	fs::path virtualStorageRoot = fs::current_path();
 	virtualStorageRoot /= "VirtualStorage";
 	
-	unsigned int numOfContainers = 4;
+	unsigned int numOfContainers = 1;
 	FirstFit ff;
 	VStorage virtualStorage(virtualStorageRoot, numOfContainers, {&ff});
 	BaseServer bs{INSTRUCTION_PORT, DATA_PORT, virtualStorage};
