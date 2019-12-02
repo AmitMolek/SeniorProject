@@ -16,6 +16,7 @@ VStorage::VStorage(fs::path _rootPath,
 	StorageObject(_rootPath), containers(), algorithms(std::move(_algorithms)) {
 	containersCount = 0;
 
+	CreatePathFolders();
 	CreateContainers(containers, _containersCount);
 }
 
@@ -28,7 +29,8 @@ void VStorage::CreateContainer(unsigned int id, uint64_t _capacity, StorageObjec
 	cont.SetUsedCapacity(0);
 	cont.SetParent(parent);
 
-	fs::create_directory(cont.GetPath());
+	if (!fs::exists(cont.GetPath()))
+		fs::create_directory(cont.GetPath());
 	ConsoleOutput() << "[INFO] Created container " << cont.GetPrint() << "\n";
 	db::Database::Instance() << &cont;
 	containers.push_back(std::move(cont));

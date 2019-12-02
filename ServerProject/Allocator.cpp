@@ -8,7 +8,7 @@ VContainer* Allocator::AllocateContainer(unsigned long long int fileSize, std::v
 	std::vector<unsigned long long int> freeCapacity;
 	for (auto& cont : containers)
 		freeCapacity.push_back(cont.GetFreeCapacity());
-	int containerIndex = storageAlgo->RunAlgorithm(fileSize, freeCapacity);
+	int containerIndex = storageAlgo->RunAlgorithm(fileSize, containers);
 
 	if (containerIndex > 0)
 		return &containers[containerIndex];
