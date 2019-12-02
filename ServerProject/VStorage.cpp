@@ -14,10 +14,12 @@ VStorage::VStorage(fs::path _rootPath,
 				   unsigned int _containersCount, 
 				   std::vector<IBPAlgorithm*> _algorithms) :
 	StorageObject(_rootPath), containers(), algorithms(std::move(_algorithms)) {
-	containersCount = 0;
+	db::Database::Instance().getNumOfContainers(&containersCount);
+	
 
 	CreatePathFolders();
 	CreateContainers(containers, _containersCount);
+
 }
 
 void VStorage::CreateContainer(unsigned int id, uint64_t _capacity, StorageObject* parent){
@@ -39,9 +41,7 @@ void VStorage::CreateContainer(unsigned int id, uint64_t _capacity, StorageObjec
 
 void VStorage::CreateContainers(std::vector<VContainer>& _containers, unsigned int count) {
 	db::Database::Instance().retrieveContainers(_containers);
-	/*for (unsigned int i = 0; i < count; i++) {
-		CreateContainer(i, (unsigned)(CONTAINER_SIZE), this);
-	}*/
+	
 }
 
 void VStorage::AllocateFiles(std::vector<std::pair<VFile&, FileUploadInfo&>> files) {

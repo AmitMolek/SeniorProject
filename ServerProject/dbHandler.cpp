@@ -224,3 +224,20 @@ bool dbh::Database::retrieveContainers(std::vector<VContainer>& containersVector
 	return true;
 }
 
+static int getNumOfContainers_callback(void* param, int argc, char** argv, char** azColName)
+{
+	if (argc == 0) return 0;
+	
+	int* count = (int*)param;
+	*count = atoi(argv[0]);
+
+	return 1;
+}
+bool dbh::Database::getNumOfContainers(unsigned int *count)
+{
+	
+	std::string sql = "SELECT COUNT(id) FROM containers;";
+	int rc = sqlite3_exec(dbh::Database::Instance().db, sql.c_str(), getNumOfContainers_callback, count, NULL);
+
+	return true;
+}
