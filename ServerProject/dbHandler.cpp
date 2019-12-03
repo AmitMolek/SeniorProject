@@ -58,7 +58,7 @@ bool dbh::Database::StoreFile(std::string fileName,
 							 std::string userName, 
 							 fs::path storagePath,
 							 uint64_t fileSize){
-	std::string tmpPath = filePath.string();
+	std::string tmpPath = filePath.parent_path().string();
 	std::string::size_type i = tmpPath.find(storagePath.string());
 	if (i != std::string::npos) {
 		tmpPath.erase(i, storagePath.string().length());
@@ -95,7 +95,7 @@ bool dbHandler::addFileToDB(string fileName,fs:: path filePath, string userName,
 	string sql;
 	
 	
-	std::string tmpPath = filePath.string();
+	std::string tmpPath = filePath.parent_path().string();
 		std::string::size_type i = tmpPath.find(storagePath.string());
 		if (i != std::string::npos)
 		{
@@ -155,26 +155,41 @@ int dbHandler::Database::updateVcontainerUsedCapacity(std::string containerName,
 	return 0;
 }
 
-
-// This is the callback function to set the param to the value
 static int retrieveFiles_callback(void* param, int argc, char** argv, char** azColName)
 {
 	if (argc == 0) return 0;
-	
+	for (int i = 0; i < 4; i++)
+	{
+		cout << azColName[i] << " " << argv[i] << endl;
+	}
 
-	
+	std::pair<VContainer&, std::vector<VFile>*>* pointerParams = (std::pair<VContainer&, std::vector<VFile>*> *)param;
+	std::vector<VFile>* param1 = pointerParams->second;
+
+	fs::path fileRoot = fs::current_path();
+	fileRoot /= "VirtualStorage\\";
+	fileRoot /= argv[1];
+	string fileName = argv[0];
+	uint64_t fileSize = atoi(argv[3]);
+	uint64_t containerUsedCapacity = atoi(argv[2]);
+	VFile tmpVFile(fileRoot, fileName, fileSize, &pointerParams->first);
+
+	(*param1).push_back(std::move(tmpVFile));
 	return 0;
 }
 
-bool retrieveFiles(std::vector<VFile>& files, std::string folderName)
+bool retrieveFiles(VContainer &parent,std::vector<VFile>* files, std::string folderName)
 {
-	
-
-	std::string sql = "SELECT * FROM files WHERE folder = " + folderName + ";";
-	int rc = sqlite3_exec(dbh::Database::Instance().db, sql.c_str(), retrieveFiles_callback, &files, NULL);
+	std::pair<VContainer&, std::vector<VFile>* > params = { parent ,files };
+	std::pair<VContainer & , std::vector<VFile> * > *pointerParams = &params;
+	//std::string sql = "SELECT * FROM files WHERE folder = " + folderName + ";";
+	std::string sql = "SELECT * FROM files WHERE folder ='" + folderName + "';";
+	int rc = sqlite3_exec(dbh::Database::Instance().db, sql.c_str(), retrieveFiles_callback, pointerParams, NULL);
 	
 	return 0;
 }
+
+
 
 
 
@@ -183,11 +198,21 @@ static int retrieveContainers_callback(void* param, int argc, char** argv, char*
 	if (argc == 0) return 0;
 	for (int i = 0; i < 4; i++) 
 	{
-		cout << azColName[i] << " " << argv[i];
+		cout << azColName[i] << " " << argv[i]<<endl;
 	}
+	std::vector<VContainer>* param1 = (std::vector<VContainer>*)param;
 	
-
-
+	fs::path containerRoot = fs::current_path();
+	containerRoot /= "VirtualStorage\\";
+	containerRoot /= argv[1];
+	uint64_t containerCapacity = atoi(argv[2]);
+	uint64_t containerUsedCapacity = atoi(argv[2]);
+	VContainer tmpContainer(containerRoot, containerCapacity, containerUsedCapacity,NULL);
+	string s =  "/";
+	s += argv[1];
+	
+	retrieveFiles(tmpContainer,&tmpContainer.files,s);
+	(*param1).push_back(std::move(tmpContainer));
 	return 0;
 }
 
@@ -199,3 +224,20 @@ bool dbh::Database::retrieveContainers(std::vector<VContainer>& containersVector
 	return true;
 }
 
+static int getNumOfContainers_callback(void* param, int argc, char** argv, char** azColName)
+{
+	if (argc == 0) return 0;
+	
+	int* count = (int*)param;
+	*count = atoi(argv[0]);
+
+	return 1;
+}
+bool dbh::Database::getNumOfContainers(unsigned int *count)
+{
+	
+	std::string sql = "SELECT COUNT(id) FROM containers;";
+	int rc = sqlite3_exec(dbh::Database::Instance().db, sql.c_str(), getNumOfContainers_callback, count, NULL);
+
+	return true;
+}

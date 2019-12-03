@@ -14,10 +14,12 @@ VStorage::VStorage(fs::path _rootPath,
 				   unsigned int _containersCount, 
 				   std::vector<IBPAlgorithm*> _algorithms) :
 	StorageObject(_rootPath), containers(), algorithms(std::move(_algorithms)) {
-	containersCount = 0;
+	db::Database::Instance().getNumOfContainers(&containersCount);
+	
 
 	CreatePathFolders();
 	CreateContainers(containers, _containersCount);
+
 }
 
 void VStorage::CreateContainer(unsigned int id, uint64_t _capacity, StorageObject* parent){
@@ -38,9 +40,8 @@ void VStorage::CreateContainer(unsigned int id, uint64_t _capacity, StorageObjec
 }
 
 void VStorage::CreateContainers(std::vector<VContainer>& _containers, unsigned int count) {
-	for (unsigned int i = 0; i < count; i++) {
-		CreateContainer(i, (unsigned)(CONTAINER_SIZE), this);
-	}
+	db::Database::Instance().retrieveContainers(_containers);
+	
 }
 
 void VStorage::AllocateFiles(std::vector<std::pair<VFile&, FileUploadInfo&>> files) {
@@ -81,14 +82,14 @@ void VStorage::AllocateFiles(std::vector<std::pair<VFile&, FileUploadInfo&>> fil
 	}
 }
 
-void VStorage::AllocateFile(VFile& vFile, FileUploadInfo& _fileInfo){
-	CreateContainers(containers, 3);
-
-	fs::path filePath = containers[0].GetPath();
-	filePath /= _fileInfo.fileName;
-
-	vFile = VFile(filePath, _fileInfo.fileName, _fileInfo.fileSize);
-}
+//void VStorage::AllocateFile(VFile& vFile, FileUploadInfo& _fileInfo){
+//	CreateContainers(containers, 3);
+//
+//	fs::path filePath = containers[0].GetPath();
+//	filePath /= _fileInfo.fileName;
+//
+//	vFile = VFile(filePath, _fileInfo.fileName, _fileInfo.fileSize);
+//}
 
 void VStorage::CreatePathFolders() {
 	if (!fs::exists(GetPath()))

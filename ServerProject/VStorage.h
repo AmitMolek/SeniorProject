@@ -30,7 +30,6 @@ public:
 private:
 	void CreateContainer(unsigned int id, uint64_t _capacity, StorageObject* parent);
 	void CreateContainers(std::vector<VContainer>& _containers, unsigned int count);
-
 	void CreatePathFolders();
 };
 
