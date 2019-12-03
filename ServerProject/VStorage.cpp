@@ -10,15 +10,21 @@ constexpr uint64_t CONTAINER_SIZE = 10 * 1024 * 1024;
 
 namespace db = dbHandler;
 
-VStorage::VStorage(fs::path _rootPath, 
-				   unsigned int _containersCount, 
-				   std::vector<IBPAlgorithm*> _algorithms) :
+VStorage::VStorage(fs::path _rootPath,
+				   std::vector<IBPAlgorithm*> _algorithms,
+				   bool loadFromDB,
+				   unsigned int _containersCount) :
 	StorageObject(_rootPath), containers(), algorithms(std::move(_algorithms)) {
-	db::Database::Instance().getNumOfContainers(&containersCount);
-	
+	//CreatePathFolders();
+	containersCount = 0;
+	CreatePath();
 
-	CreatePathFolders();
-	CreateContainers(containers, _containersCount);
+	if (loadFromDB) {
+		db::Database::Instance().retrieveContainers(containers);
+		containersCount = containers.size();
+	} else {
+		CreateContainers(containers, _containersCount);
+	}
 
 }
 
@@ -40,8 +46,8 @@ void VStorage::CreateContainer(unsigned int id, uint64_t _capacity, StorageObjec
 }
 
 void VStorage::CreateContainers(std::vector<VContainer>& _containers, unsigned int count) {
-	db::Database::Instance().retrieveContainers(_containers);
-	
+	for (unsigned int i = 0; i < count; i++)
+		CreateContainer(i, (uint64_t)(CONTAINER_SIZE), this);
 }
 
 void VStorage::AllocateFiles(std::vector<std::pair<VFile&, FileUploadInfo&>> files) {
@@ -68,7 +74,7 @@ void VStorage::AllocateFiles(std::vector<std::pair<VFile&, FileUploadInfo&>> fil
 		if (contIndex > -1) {
 			parentCont = &containers[contIndex];
 		} else {
-			CreateContainer(containersCount, (unsigned)(CONTAINER_SIZE), this);
+			CreateContainer(containersCount, (uint64_t)(CONTAINER_SIZE), this);
 			parentCont = &containers[containersCount - 1];
 		}
 

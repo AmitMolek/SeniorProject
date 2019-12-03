@@ -158,10 +158,10 @@ int dbHandler::Database::updateVcontainerUsedCapacity(std::string containerName,
 static int retrieveFiles_callback(void* param, int argc, char** argv, char** azColName)
 {
 	if (argc == 0) return 0;
-	for (int i = 0; i < 4; i++)
-	{
-		cout << azColName[i] << " " << argv[i] << endl;
-	}
+	//for (int i = 0; i < 4; i++)
+	//{
+	//	cout << azColName[i] << " " << argv[i] << endl;
+	//}
 
 	std::pair<VContainer&, std::vector<VFile>*>* pointerParams = (std::pair<VContainer&, std::vector<VFile>*> *)param;
 	std::vector<VFile>* param1 = pointerParams->second;
@@ -196,17 +196,17 @@ bool retrieveFiles(VContainer &parent,std::vector<VFile>* files, std::string fol
 static int retrieveContainers_callback(void* param, int argc, char** argv, char** azColName)
 {
 	if (argc == 0) return 0;
-	for (int i = 0; i < 4; i++) 
-	{
-		cout << azColName[i] << " " << argv[i]<<endl;
-	}
+	//for (int i = 0; i < 4; i++) 
+	//{
+	//	cout << azColName[i] << " " << argv[i]<<endl;
+	//}
 	std::vector<VContainer>* param1 = (std::vector<VContainer>*)param;
 	
 	fs::path containerRoot = fs::current_path();
 	containerRoot /= "VirtualStorage\\";
 	containerRoot /= argv[1];
 	uint64_t containerCapacity = atoi(argv[2]);
-	uint64_t containerUsedCapacity = atoi(argv[2]);
+	uint64_t containerUsedCapacity = atoi(argv[3]);
 	VContainer tmpContainer(containerRoot, containerCapacity, containerUsedCapacity,NULL);
 	string s =  "/";
 	s += argv[1];

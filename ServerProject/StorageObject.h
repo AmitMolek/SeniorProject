@@ -22,5 +22,7 @@ public:
 	void SetPath(fs::path&& path);
 
 	friend std::ostream& operator << (std::ostream& out, StorageObject& obj);
+protected:
+	bool CreatePath();
 };
 

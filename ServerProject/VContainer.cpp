@@ -1,6 +1,6 @@
 #include "VContainer.h"
 
-VContainer::VContainer() : StorageObject("", nullptr), capacity(0), usedCapacity(0), files(){}
+VContainer::VContainer() : StorageObject("", nullptr), capacity(0), usedCapacity(0), files(), isContainerClosed(false){}
 
 VContainer::VContainer(VContainer&& other) noexcept :
 	StorageObject(std::move(other)), 
@@ -17,6 +17,8 @@ VContainer::VContainer(fs::path _rootPath,
 	capacity = _capacity;
 	usedCapacity = _usedCapacity;
 	isContainerClosed = false;
+
+	CreatePath();
 }
 
 std::ostream& operator << (std::ostream& out, VContainer& obj) {

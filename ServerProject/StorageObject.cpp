@@ -86,3 +86,13 @@ std::ostream& operator<<(std::ostream& out, StorageObject& obj) {
 		<< "]";
 	return out;
 }
+
+bool StorageObject::CreatePath() {
+	if (!fs::exists(GetPath())) {
+		fs::create_directories(GetPath());
+
+		return true;
+	}
+
+	return false;
+}

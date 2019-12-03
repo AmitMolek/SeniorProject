@@ -22,8 +22,9 @@ public:
 	std::vector<IBPAlgorithm*> algorithms;
 
 	VStorage(fs::path _rootPath, 
-			 unsigned int _containersCount, 
-			 std::vector<IBPAlgorithm*> _algorithms);
+			 std::vector<IBPAlgorithm*> _algorithms,
+			 bool loadFromDB = false,
+			 unsigned int _containersCount = 0);
 
 	void AllocateFile(VFile& vFile, FileUploadInfo& _fileInfo);
 	void AllocateFiles(std::vector<std::pair<VFile&, FileUploadInfo&>> files);
