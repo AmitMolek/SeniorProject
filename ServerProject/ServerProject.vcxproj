@@ -20,7 +20,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Allocator.cpp" />
-    <ClCompile Include="Array3D.cpp" />
     <ClCompile Include="BaseServer.cpp" />
     <ClCompile Include="BestFit.cpp" />
     <ClCompile Include="CommunicationHandler.cpp" />

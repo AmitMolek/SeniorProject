@@ -7,6 +7,8 @@
 #include "NextFit.h"
 #include "BestFit.h"
 
+#include "Array3D.h"
+
 #define INSTRUCTION_PORT "23456"
 #define DATA_PORT "23457"
 

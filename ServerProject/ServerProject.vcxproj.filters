@@ -105,9 +105,6 @@
     <ClCompile Include="BestFit.cpp">
       <Filter>Source Files\Algorithms</Filter>
     </ClCompile>
-    <ClCompile Include="Array3D.cpp">
-      <Filter>Source Files\Algorithms</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
