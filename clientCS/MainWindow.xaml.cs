@@ -24,6 +24,7 @@ namespace clientCS
         private void btnConnect_Click(object sender, RoutedEventArgs e)
         {
             ftp = new BaseClient("127.0.0.1", 23456, 23457,txtUserName.Text);
+            //ftp = new BaseClient("10.0.0.100", 23456, 23457, txtUserName.Text);
             while (ftp.getDataSocket().Connected == false) ;
            
             lblConnectionStatus.Content = "connected";

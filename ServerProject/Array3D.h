@@ -14,15 +14,15 @@ private:
 public:
 	Array3D() = delete;
 
-	Array3D(size_t _height, size_t _width, size_t _depth) :
+	Array3D(size_t _width, size_t _height, size_t _depth) :
 		arr(new T[(size_t)(_height * _width * _depth)]),
 		height(_height),
 		width(_width),
 		depth(_depth) {
 	}
 
-	Array3D(size_t _height, size_t _width, size_t _depth, T initial) :
-		Array3D(_height, _width, _height) {
+	Array3D(size_t _width, size_t _height, size_t _depth, T initial) :
+		Array3D(_width, _height, _depth) {
 		for (size_t i = 0; i < GetLength(); i++)
 			arr[i] = initial;
 	}
@@ -47,11 +47,11 @@ public:
 	}
 
 	T& operator()(size_t x, size_t y, size_t z) {
-		if (x >= height || y >= width || z >= depth) {
+		if (x >= width || y >= height || z >= depth) {
 			throw std::invalid_argument("Array3D argument out of range");
 		}
 		try {
-			return arr[(z * width * height) + (y * width) + x];
+			return arr[(height * depth * x) + (depth * y) + z];
 		} catch (std::exception& ex) {
 			throw ex;
 		}

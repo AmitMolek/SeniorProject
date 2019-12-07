@@ -16,29 +16,17 @@
 #include <boost/algorithm/string/replace.hpp>
 using namespace std;
 
-namespace fs = filesystem;
+namespace fs = std::experimental::filesystem;
 namespace db = dbHandler;
 namespace bo = boost;
+
 void DataTransferHandler::Thread_GetData(ConnectionInfo* con, FileUploadInfo fileInfo) {
 	std::pair<int, string> msgInfo;
 
-	fs::path projectPath = fs::current_path();
-	fs::path testFolder = "TestFiles";
-
-	fs::path testPath = projectPath;
-	fs::path testFilePath;
-	testPath /= testFolder;
-	testFilePath = testPath;
-	fs::create_directories(testFilePath);
-	testFilePath /= fileInfo.fileName;
-
 	VFile outFile;
 	con->storage->AllocateFiles({ {outFile, fileInfo} });
-	ConsoleOutput() << "File info " << fileInfo.fileSize << "\n";
-	ConsoleOutput() << "Storing file " << outFile.GetPath() << "\n";
-	//con->storage->AllocateFile(outFile, fileInfo);
 
-	ConsoleOutput() << "[INFO][" << con->clientAddress << "] Started handling client file " << fileInfo.fileName << "\n";
+	ConsoleOutput() << "[INFO][" << con->clientAddress << "] Started handling client file " << outFile << "\n";
 	CommunicationHandler::SendBasicMsg(*con->instructionSocket, "|pass:server_wait_on_file");
 
 	string fileStartInstruction = "|pass:file_start";
@@ -77,6 +65,7 @@ void DataTransferHandler::Thread_GetData(ConnectionInfo* con, FileUploadInfo fil
 			string st = VContainerName.string();
 			
 			db::Database::Instance().updateVcontainerUsedCapacity(st, outFile.fileSize);
+			((VContainer*)outFile.GetParent())->UseCapacity(outFile.fileSize);
 			break;
 		}
 	}
