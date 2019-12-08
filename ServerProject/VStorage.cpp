@@ -26,6 +26,17 @@ VStorage::VStorage(fs::path _rootPath,
 		CreateContainers(containers, _containersCount);
 	}
 
+	input_files_weight_distribution = 0;
+	max_items_in_container = 0;
+	max_container_size = 0;
+}
+
+void VStorage::SetSystemParams(size_t weight_dist,
+					 size_t maxItemsInContainer,
+					 size_t maxContainerSize) {
+	input_files_weight_distribution = weight_dist;
+	max_items_in_container = maxItemsInContainer;
+	max_container_size = maxContainerSize;
 }
 
 void VStorage::CreateContainer(unsigned int id, uint64_t _capacity, StorageObject* parent){
@@ -47,7 +58,7 @@ void VStorage::CreateContainer(unsigned int id, uint64_t _capacity, StorageObjec
 
 void VStorage::CreateContainers(std::vector<VContainer>& _containers, unsigned int count) {
 	for (unsigned int i = 0; i < count; i++)
-		CreateContainer(i, (uint64_t)(CONTAINER_SIZE), this);
+		CreateContainer(i, (uint64_t)(max_container_size), this);
 }
 
 void VStorage::AllocateFiles(std::vector<std::pair<VFile&, FileUploadInfo&>> files) {
@@ -55,7 +66,19 @@ void VStorage::AllocateFiles(std::vector<std::pair<VFile&, FileUploadInfo&>> fil
 	for (IBPAlgorithm* algo : algorithms)
 		algosPtr.push_back(algo);
 
-	IBPAlgorithm* algo = Allocator::GetStorageAlgorithm(algosPtr, files.size());
+	size_t totalFilesUploaded = 0;
+	for (VContainer& cont : containers) {
+		totalFilesUploaded += cont.files.size();
+	}
+	totalFilesUploaded += files.size();
+
+	//IBPAlgorithm* algo = Allocator::GetStorageAlgorithm(algosPtr, files.size());
+	ConsoleOutput() << "[INFO] Total files uploaded so far " << totalFilesUploaded << "\n";
+	IBPAlgorithm* algo = Allocator::GetStorageAlgorithm(algosPtr, 
+														totalFilesUploaded, 
+														input_files_weight_distribution,
+														max_items_in_container,
+														max_container_size);
 	for(auto& pair : files){
 		std::vector<uint64_t> containersFreeCapacity;
 		for (VContainer& cont : containers) {
@@ -67,7 +90,6 @@ void VStorage::AllocateFiles(std::vector<std::pair<VFile&, FileUploadInfo&>> fil
 				<< "[" << pair.second.fileName << "," << pair.second.fileSize << "]\n";
 		}
 
-		//int contIndex = algo->RunAlgorithm(pair.second.fileSize, containersFreeCapacity);
 		int contIndex = algo->RunAlgorithm(pair.second.fileSize, containers);
 
 		VContainer* parentCont;
@@ -83,19 +105,11 @@ void VStorage::AllocateFiles(std::vector<std::pair<VFile&, FileUploadInfo&>> fil
 		pair.first.SetPath(filePath);
 		pair.first.fileName = pair.second.fileName;
 		pair.first.fileSize = pair.second.fileSize;
-		parentCont->UseCapacity(pair.first.fileSize);
+		pair.first.SetParent(parentCont);
+		//parentCont->UseCapacity(pair.first.fileSize);
 		ConsoleOutput() << "[INFO] Stored " << pair.first << " in container " << parentCont->GetPrint() << "\n";
 	}
 }
-
-//void VStorage::AllocateFile(VFile& vFile, FileUploadInfo& _fileInfo){
-//	CreateContainers(containers, 3);
-//
-//	fs::path filePath = containers[0].GetPath();
-//	filePath /= _fileInfo.fileName;
-//
-//	vFile = VFile(filePath, _fileInfo.fileName, _fileInfo.fileSize);
-//}
 
 void VStorage::CreatePathFolders() {
 	if (!fs::exists(GetPath()))

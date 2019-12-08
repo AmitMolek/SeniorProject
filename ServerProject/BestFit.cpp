@@ -6,7 +6,10 @@ std::string BestFit::GetName() {
 	return "BestFit";
 }
 
-double BestFit::CalculateMean(size_t input_length) {
+double BestFit::CalculateMean(size_t input_length,
+							  size_t max_input_weight,
+							  size_t max_items_in_bin,
+							  size_t max_bin_size) {
 	return 3.0;
 }
 

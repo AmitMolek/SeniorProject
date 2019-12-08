@@ -7,7 +7,6 @@
 #include "NextFit.h"
 #include "BestFit.h"
 
-#include "Array3D.h"
 #include "dbHandler.h"
 
 #define INSTRUCTION_PORT "23456"
@@ -19,13 +18,21 @@ int main() {
 	fs::path virtualStorageRoot = fs::current_path();
 	virtualStorageRoot /= "VirtualStorage";
 	
-	unsigned int numOfContainers = 1;
 	FirstFit ff;
 	NextFit nf;
 	BestFit bf;
-	VStorage virtualStorage(virtualStorageRoot, { &ff }, true);
+
+	size_t files_distribution = 10;
+	size_t container_size = 10;
+	size_t max_items_in_container = 10;
+
+	VStorage virtualStorage(virtualStorageRoot, { &ff, &nf }, true);
+	virtualStorage.SetSystemParams(files_distribution, 
+								   max_items_in_container, 
+								   container_size);
 	BaseServer bs{INSTRUCTION_PORT, DATA_PORT, virtualStorage};
-	
-	while (true);
+
+	int i;
+	std::cin >> i;
 	std::cout << "[INFO] Main thread finished\n";
 }

@@ -1,5 +1,7 @@
 #include "StorageObject.h"
 
+#include <ostream>
+
 //StorageObject::StorageObject(fs::path _rootPath,
 //							 unsigned long long int _capacity, 
 //							 unsigned long long int _usedCapacity, 
