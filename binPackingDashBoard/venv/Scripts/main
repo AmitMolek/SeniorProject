@@ -22,7 +22,7 @@ def create_connection():
     """ create a database connection to a database that resides
         in the memory
     """
-    conn = sqlite3.connect(r"../serverProject/binPacking.db")
+    conn = sqlite3.connect(r"../../../serverProject/binPacking.db")
     print("sqlite version " + sqlite3.version)
     return conn
 
