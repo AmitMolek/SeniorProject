@@ -16,7 +16,7 @@
 #include <boost/algorithm/string/replace.hpp>
 using namespace std;
 
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 namespace db = dbHandler;
 namespace bo = boost;
 
