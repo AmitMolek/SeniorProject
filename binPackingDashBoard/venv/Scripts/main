@@ -13,6 +13,7 @@ import plotly.graph_objs as go
 import random
 import time
 import datetime
+import dash_daq as daq
 external_stylesheets =['https://codepen.io/chriddyp/pen/bWLwgP.css', dbc.themes.BOOTSTRAP]
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
@@ -68,14 +69,23 @@ def getFreeCapacity(conn):
     freeCapacity = totalCapacity[0][0] - usedCapacity[0][0]
     return freeCapacity
 
+def getUsedCapacity(conn):
+    cur = conn.cursor()
+    cur.execute("SELECT SUM(usedCapacity) FROM containers")
+    usedCapacity = cur.fetchall()
+    freeCapacity = usedCapacity[0][0]
+    return freeCapacity
 
+oldNumberOfFolders =0
+colors = []
 if __name__ == '__main__':
     conn = create_connection()
     numberOfContainers = getNumberOfContainers (conn)
-    colors = []
-    for i in range(numberOfContainers):
-        color = "%06x" % random.randint(0, 0xFFFFFF)
-        colors.append(color)
+    if oldNumberOfFolders !=numberOfContainers:
+        colors = []
+        for i in range(numberOfContainers):
+            color = "%06x" % random.randint(0, 0xFFFFFF)
+            colors.append(color)
     foldersNames = getAllFoldersName(conn)
     foldersSizes = getAllFoldersSize(conn)
 
@@ -83,6 +93,10 @@ if __name__ == '__main__':
     freeCapacity = []
     timeStampForFreeCapacity.append(datetime.datetime.now().hour)
     freeCapacity.append(getFreeCapacity(conn))
+    freeCapacityValue = getFreeCapacity(conn)
+    usedCapacity = getUsedCapacity(conn)
+    dataForPieChart = [freeCapacityValue,usedCapacity]
+
 usedCapacityBar = dcc.Graph(
         id = "usedCapacityBar",
         figure ={
@@ -203,9 +217,31 @@ freeSpaceGraph = dcc.Graph(
 )
 
 
+usedCapacityPie = dcc.Graph(
+        id='usedCapacityPie',
+        figure={
+            'data':[{'values': dataForPieChart,
+                     "labels": ['Free Capacity', 'Used Capacity'],
+                     "hole": .5,
+                     'type': 'pie'
+                      }],
+            'layout': {
+                "paper_bgcolor":"#111111",
+                'margin': {
+                    'l': 30,
+                    'r': 0,
+                    'b': 30,
+                    't': 0
+                },
+                'legend': {'Free Capacity': 0, 'Used Capacity': 1}
+            }
+        }
+    )
+
+
 
 graphRow0 = dbc.Row([ dbc.Col(usedCapacityBar, md=6),dbc.Col(freeSpaceGraph, md=6)])
-graphRow1 = dbc.Row([dbc.Col(numberOfFolders, md=3)])
+graphRow1 = dbc.Row([dbc.Col(numberOfFolders, md=3),dbc.Col(usedCapacityPie, md=3)])
 
 
 app.layout = html.Div([html.Br(),graphRow0,graphRow1, html.Br(), dcc.Interval(
@@ -217,14 +253,19 @@ app.layout = html.Div([html.Br(),graphRow0,graphRow1, html.Br(), dcc.Interval(
 @app.callback(Output('usedCapacityBar', 'figure'),
               [Input('interval-component', 'n_intervals')])
 def update_usedCapacityPerFolder(n):
+    global oldNumberOfFolders
+    global colors
     conn = create_connection()
     numberOfContainers = getNumberOfContainers(conn)
-    colors = []
-    for i in range(numberOfContainers):
-        color = "%06x" % random.randint(0, 0xFFFFFF)
-        colors.append(color)
+
+    if oldNumberOfFolders != numberOfContainers:
+        colors = []
+        for i in range(numberOfContainers):
+            color = "%06x" % random.randint(0, 0xFFFFFF)
+            colors.append(color)
     foldersNames = getAllFoldersName(conn)
     foldersSizes = getAllFoldersSize(conn)
+    oldNumberOfFolders = numberOfContainers;
     return {
                   "data": [
                   {
@@ -348,6 +389,33 @@ def update_freeCapacity(n):
             "showlegend": False
         }
     }
+
+
+@app.callback(Output('usedCapacityPie', 'figure'),
+              [Input('interval-component', 'n_intervals')])
+def update_freeCapacityPieChart(n):
+    conn = create_connection()
+
+    freeCapacityValue = getFreeCapacity(conn)
+    usedCapacity = getUsedCapacity(conn)
+    dataForPieChart = [freeCapacityValue, usedCapacity]
+    return {
+                 'data':[{'values': dataForPieChart,
+                          "labels": ['Free Capacity', 'Used Capacity'],
+                          "hole": .5,
+                     'type': 'pie'
+                      }],
+            'layout': {
+                "paper_bgcolor": "#111111",
+                'margin': {
+                    'l': 30,
+                    'r': 0,
+                    'b': 30,
+                    't': 0
+                },
+               
+            }
+        }
 
 if __name__ == '__main__':
     app.run_server(debug=True)
