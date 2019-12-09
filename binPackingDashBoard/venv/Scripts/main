@@ -1,0 +1,253 @@
+import dash
+import dash_core_components as dcc
+import dash_html_components as html
+import dash_bootstrap_components as dbc
+from dash.dependencies import Input, Output, State
+import plotly
+import chart_studio.plotly as py
+
+import sqlite3
+from sqlite3 import Error
+import numpy as np
+import plotly.graph_objs as go
+import random
+import time
+
+external_stylesheets =['https://codepen.io/chriddyp/pen/bWLwgP.css', dbc.themes.BOOTSTRAP]
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+
+
+conn = None;
+def create_connection():
+    """ create a database connection to a database that resides
+        in the memory
+    """
+    conn = sqlite3.connect(r"../../../serverProject/binPacking.db")
+    print("sqlite version " + sqlite3.version)
+    return conn
+
+
+def getAllFoldersName(conn):
+    cur = conn.cursor()
+    cur.execute("SELECT name FROM containers")
+    print("starting printing")
+
+    print("end printing")
+    folderNamesList = []
+    rows = cur.fetchall()
+    for row in rows:
+       folderNamesList.append(row[0])
+    print(folderNamesList)
+    return folderNamesList
+
+def getAllFoldersSize(conn):
+    cur = conn.cursor()
+    cur.execute("SELECT usedCapacity FROM containers")
+    print("starting printing")
+
+    print("end printing")
+    folderNamesList = []
+    rows = cur.fetchall()
+    for row in rows:
+       folderNamesList.append(row[0])
+    print(folderNamesList)
+    return folderNamesList
+
+def getNumberOfContainers(conn):
+    cur = conn.cursor()
+    cur.execute("SELECT COUNT(*) FROM containers")
+    numberOfFolders = cur.fetchall()
+    return numberOfFolders[0][0]
+
+
+if __name__ == '__main__':
+    conn = create_connection()
+    numberOfContainers = getNumberOfContainers (conn)
+    colors = []
+    for i in range(numberOfContainers):
+        color = "%06x" % random.randint(0, 0xFFFFFF)
+        colors.append(color)
+    foldersNames = getAllFoldersName(conn)
+    foldersSizes = getAllFoldersSize(conn)
+
+
+usedCapacityBar = dcc.Graph(
+        id = "usedCapacityBar",
+        figure ={
+                  "data": [
+                  {
+                          'x':foldersNames,
+                          'y':foldersSizes,
+                          'name':'SF Zoo',
+                          'type':'bar',
+                          'marker' :dict(color=colors),
+                  }],
+                "layout": {
+                      "title" : dict(text ="used capacity per folder",
+                                     font =dict(
+                                     size=20,
+                                     color = 'white')),
+                      "xaxis" : dict(tickfont=dict(
+                          color='white')),
+                      "yaxis" : dict(tickfont=dict(
+                          color='white')),
+                      "paper_bgcolor":"#111111",
+                      "plot_bgcolor":"#111111",
+                      #"grid": {"rows": 0, "columns": 0},
+                      "annotations": [
+                          {
+                              "font": {
+                                  "size": 20
+                              },
+                              "showarrow": False,
+                              "text": "",
+                              "x": 0.2,
+                              "y": 0.2
+                          }
+                      ],
+                      "showlegend": False
+                  }
+              }
+)
+numberOfFolders = dcc.Graph(
+        id = "numberOfFolders",
+        figure ={
+                  "data": [
+                  {
+                          'x':["number of folders"],
+                          'y':[numberOfContainers],
+                          'name':'SF Zoo',
+                          'type':'bar',
+                          'marker' :dict(color='yellow'),
+
+                  }],
+                "layout": {
+                      "title" : dict(text ="number of folders",
+                                     font =dict(
+                                     size=20,
+                                     color = 'white')),
+                      "xaxis" : dict(tickfont=dict(
+                          color='white')),
+                      "yaxis" : dict(tickfont=dict(
+                          color='white')),
+                      "paper_bgcolor":"#111111",
+                      "plot_bgcolor":"#111111",
+                      #"grid": {"rows": 0, "columns": 0},
+                      "annotations": [
+                          {
+                              "font": {
+                                  "size": 20
+                              },
+                              "showarrow": False,
+                              "text": "",
+                              "x": 0.2,
+                              "y": 0.2
+                          }
+                      ],
+                      "showlegend": False
+                  }
+              }
+)
+graphRow0 = dbc.Row([ dbc.Col(usedCapacityBar, md=12)])
+graphRow1 = dbc.Row([dbc.Col(numberOfFolders, md=3)])
+
+
+app.layout = html.Div([html.Br(),graphRow0,graphRow1, html.Br(), dcc.Interval(
+            id='interval-component',
+            interval=10*1000, # in milliseconds
+            n_intervals=0
+        )], style={'backgroundColor':'black'})
+
+@app.callback(Output('usedCapacityBar', 'figure'),
+              [Input('interval-component', 'n_intervals')])
+def update_usedCapacityPerFolder(n):
+    conn = create_connection()
+    numberOfContainers = getNumberOfContainers(conn)
+    colors = []
+    for i in range(numberOfContainers):
+        color = "%06x" % random.randint(0, 0xFFFFFF)
+        colors.append(color)
+    foldersNames = getAllFoldersName(conn)
+    foldersSizes = getAllFoldersSize(conn)
+    return {
+                  "data": [
+                  {
+                          'x':foldersNames,
+                          'y':foldersSizes,
+                          'name':'SF Zoo',
+                          'type':'bar',
+                          'marker' :dict(color=colors),
+                  }],
+                "layout": {
+                      "title" : dict(text ="used capacity per folder",
+                                     font =dict(
+                                     size=20,
+                                     color = 'white')),
+                      "xaxis" : dict(tickfont=dict(
+                          color='white')),
+                      "yaxis" : dict(tickfont=dict(
+                          color='white')),
+                      "paper_bgcolor":"#111111",
+                      "plot_bgcolor":"#111111",
+                      #"grid": {"rows": 0, "columns": 0},
+                      "annotations": [
+                          {
+                              "font": {
+                                  "size": 20
+                              },
+                              "showarrow": False,
+                              "text": "",
+                              "x": 0.2,
+                              "y": 0.2
+                          }
+                      ],
+                      "showlegend": False
+                  }
+              }
+
+
+@app.callback(Output('numberOfFolders', 'figure'),
+              [Input('interval-component', 'n_intervals')])
+def update_usedCapacityPerFolder(n):
+    conn = create_connection()
+    numberOfContainers = getNumberOfContainers(conn)
+
+    return {
+                  "data": [
+                  {
+                          'x':["number of folders"],
+                          'y':[numberOfContainers],
+                          'name':'SF Zoo',
+                          'type':'bar',
+                          'marker' :dict(color='yellow'),
+                  }],
+                "layout": {
+                      "title" : dict(text ="used capacity per folder",
+                                     font =dict(
+                                     size=20,
+                                     color = 'white')),
+                      "xaxis" : dict(tickfont=dict(
+                          color='white')),
+                      "yaxis" : dict(tickfont=dict(
+                          color='white')),
+                      "paper_bgcolor":"#111111",
+                      "plot_bgcolor":"#111111",
+                      #"grid": {"rows": 0, "columns": 0},
+                      "annotations": [
+                          {
+                              "font": {
+                                  "size": 20
+                              },
+                              "showarrow": False,
+                              "text": "",
+                              "x": 0.2,
+                              "y": 0.2
+                          }
+                      ],
+                      "showlegend": False
+                  }
+              }
+
+if __name__ == '__main__':
+    app.run_server(debug=True)
+
