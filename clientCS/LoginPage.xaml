@@ -1,0 +1,19 @@
+﻿<Window x:Class="clientCS.LoginPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:clientCS"
+      mc:Ignorable="d" 
+      d:DesignHeight="180" d:DesignWidth="320"
+      Title="MyBinPack" Background="White" Height="180" Width="320" WindowStartupLocation="CenterScreen">
+
+    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" FocusManager.FocusedElement="{Binding ElementName=txtUserName}">
+        <WrapPanel>
+            <Label Content="Username" Width="64"/>
+            <TextBox x:Name="txtUserName" Height="23" TextWrapping="Wrap" Width="120" TextAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center"/>
+        </WrapPanel>
+        <Button Content="Connect" Margin="0, 15, 0, 0" Click="btnConnect_Click"/>
+        <Label x:Name="lblWaitingConnection" HorizontalAlignment="Center"/>
+    </StackPanel>
+</Window>

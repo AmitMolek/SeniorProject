@@ -10,7 +10,7 @@ using System.Diagnostics;
 namespace client
 {
 
-    class BaseClient
+    public class BaseClient
     {
         public const int INSTRUCTION_BUFFER_SIZE = 1024;
 
@@ -50,6 +50,10 @@ namespace client
 
             // while (true) ;
         }
+
+        public BaseClient() {
+        }
+
         public void connectClient()
         {
             ConnectInstructionSocket();
