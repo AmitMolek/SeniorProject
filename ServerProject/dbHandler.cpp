@@ -233,6 +233,28 @@ static int getNumOfContainers_callback(void* param, int argc, char** argv, char*
 
 	return 1;
 }
+
+static int getListFiles_callBack(void* param, int argc, char** argv, char** azColName){
+	std::vector<std::string>* results = (std::vector<std::string>*)param;
+	std::stringstream ssOut;
+	ssOut << azColName[0];
+	ssOut << ":";
+	ssOut << argv[0];
+	ssOut << "^";
+	ssOut << azColName[1];
+	ssOut << ":";
+	ssOut << argv[1];
+	results->push_back(ssOut.str());
+	return 0;
+}
+
+bool dbh::Database::getListFiles(std::string username, std::vector<std::string>& results) {
+	std::string sql = "SELECT fileName,size FROM files WHERE owner='" + username + "';";
+	int rc = sqlite3_exec(dbh::Database::Instance().db, sql.c_str(), getListFiles_callBack, &results, NULL);
+
+	return true;
+}
+
 bool dbh::Database::getNumOfContainers(unsigned int *count)
 {
 	

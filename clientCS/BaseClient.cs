@@ -7,6 +7,8 @@ using System.Net.Sockets;
 using System.Net;
 using System.IO;
 using System.Diagnostics;
+using System.Windows.Threading;
+
 namespace client
 {
 
@@ -38,7 +40,14 @@ namespace client
 
             GetDataSocket();
 
-            Thread t = new Thread(()=>connectClient());
+            Thread t = new Thread(() => {
+                try {
+                    connectClient();
+                }catch (Exception ex) {
+                    Console.WriteLine(ex.Message);
+                }
+
+            } );
             t.IsBackground = true;
             t.Start();
 
@@ -56,7 +65,11 @@ namespace client
 
         public void connectClient()
         {
-            ConnectInstructionSocket();
+            try {
+                ConnectInstructionSocket();
+            } catch (Exception ex) {
+                throw (ex);
+            }
         }
         public class FtpException : Exception
         {
@@ -229,7 +242,7 @@ namespace client
             }
             Console.WriteLine("end reading instruction");
         }
-        public void sendFile(String fileName)
+        public void sendFile(String fileName, ref DispatcherTimer timer)
         {
             long fileSize;
             string[] splitMsg;
@@ -254,12 +267,18 @@ namespace client
             }
             dataSocket.Send(Encoding.ASCII.GetBytes("|pass:file_end"), 0);
             input.Close();
+            timer.Stop();
         }
 
         public void sendUserName(string userName)
         {
             instructionSocket.Send(Encoding.ASCII.GetBytes((string)("|pass:user_name:" + userName)));
            
+        }
+
+        public void sendGetListFiles() {
+            string instruction = "|pass:get_list_files";
+            instructionSocket.Send(Encoding.ASCII.GetBytes(instruction));
         }
     }
 

@@ -106,6 +106,7 @@ void VStorage::AllocateFiles(std::vector<std::pair<VFile&, FileUploadInfo&>> fil
 		pair.first.fileName = pair.second.fileName;
 		pair.first.fileSize = pair.second.fileSize;
 		pair.first.SetParent(parentCont);
+		//parentCont->files.push_back(std::move(pair.first));
 		//parentCont->UseCapacity(pair.first.fileSize);
 		ConsoleOutput() << "[INFO] Stored " << pair.first << " in container " << parentCont->GetPrint() << "\n";
 	}

@@ -6,12 +6,18 @@ using System;
 using Microsoft.Win32;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Threading.Tasks;
+using System.Net.Sockets;
+using System.Diagnostics;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Windows.Threading;
 
 namespace clientCS
 {
-    public class TestViewItem {
-        public string fileName;
-        public string fileSize;
+    public class FilesViewItem {
+        public string fileName { get; set; }
+        public string fileSize { get; set; }
     }
 
     /// <summary>
@@ -22,9 +28,14 @@ namespace clientCS
 
         //static  BaseClient ftp;
         BaseClient ftp;
+
+        TabItem lastTabItem;
+        List<string> pathsToUpload;
+
         public MainWindow(ref WindowShare share)
         {
             ftp = share.connection;
+            pathsToUpload = new List<string>();
             InitializeComponent();
         }
 
@@ -43,8 +54,27 @@ namespace clientCS
         private void btnSendFile_Click(object sender, RoutedEventArgs e)
         {
             string filePath = txtPath.Text;
-           ftp.sendFile(filePath);
-            //   ftp.Close();
+
+            string connectionStr = "Uploading";
+            lblFileUploadStatus.Visibility = Visibility.Visible;
+            lblFileUploadStatus.Content = connectionStr;
+            DispatcherTimer fileStatusLblTimer = new DispatcherTimer();
+            fileStatusLblTimer.Interval = TimeSpan.FromMilliseconds(250);
+            int dotCount = 1;
+            fileStatusLblTimer.Tick += (sender1, args) => {
+                lblFileUploadStatus.Content = connectionStr;
+                for (int i = 0; i < dotCount; i++)
+                    lblFileUploadStatus.Content += ".";
+                dotCount = (dotCount + 1) % 4;
+            };
+            fileStatusLblTimer.Start();
+            Task sendFile = Task.Factory.StartNew(() => { ftp.sendFile(filePath, ref fileStatusLblTimer); });
+            Dispatcher.BeginInvoke(DispatcherPriority.Background ,new Action<Task>(async (task) => {
+                await Task.Run(()=> {
+                    task.Wait();
+                });
+                lblFileUploadStatus.Content = "Finished sending";
+            }), sendFile);
         }
 
 
@@ -72,25 +102,78 @@ namespace clientCS
         private void btnBrowse_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
-            if (openFileDialog.ShowDialog() == true)
+            openFileDialog.Multiselect = true;
+            openFileDialog.Title = "Select files to upload";
+            if (openFileDialog.ShowDialog() == true) {
+                Stream[] files = openFileDialog.OpenFiles();
+                pathsToUpload.Clear();
+                foreach (Stream s in files) {
+                    pathsToUpload.Add(openFileDialog.FileName);
+                }
                 txtPath.Text = openFileDialog.FileName;
+            }
         }
 
-        private void TabControl_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e) {
+        private async void TabControl_SelectionChangedAsync(object sender, System.Windows.Controls.SelectionChangedEventArgs e) {
             var tc = sender as TabControl;
 
             if (tc != null) {
-                switch (tc.Name) {
-                    case "tab_MyFiles":
-                        Console.WriteLine("helloo world!");
-                        GridView gv = new GridView();
-                        listView_Files.View = gv;
-                        gv.Columns.Add(new GridViewColumn { Header = "File Name", DisplayMemberBinding = new Binding("fileName")});
-                        gv.Columns.Add(new GridViewColumn { Header = "File Size", DisplayMemberBinding = new Binding("fileSize") });
-                        listView_Files.Items.Add(new TestViewItem { fileName = "Test", fileSize="54"});
-                        listView_Files.Items.Add(new TestViewItem { fileName = "Test", fileSize = "54" });
-                        listView_Files.Items.Add(new TestViewItem { fileName = "Test", fileSize = "54" });
-                        break;
+                if (e.Source is TabControl) {
+                    TabItem item = tc.SelectedItem as TabItem;
+                    Debug.WriteLine("Item: " + item.Name);
+                    switch (item.Name) {
+                        case "tab_MyFiles":
+                            try {
+                                if (item == lastTabItem)
+                                    return;
+                                ftp.sendGetListFiles();
+
+                                CancellationTokenSource cts = new CancellationTokenSource();
+                                cts.CancelAfter(5000);
+                                Task<List<FilesViewItem>> waitForFiles = Task.Factory.StartNew(() => {
+                                    try {
+                                        Socket dataSoket = ftp.getDataSocket();
+                                        while (dataSoket.Available < 0) {
+                                            if (cts.IsCancellationRequested)
+                                                throw new Exception("Timeout");
+                                        }
+
+                                        const int bufferSize = 1024;
+                                        byte[] buffer = new byte[bufferSize];
+                                        dataSoket.Receive(buffer);
+
+                                        string result = System.Text.Encoding.ASCII.GetString(buffer);
+                                        string resultNoCode = result.Substring(result.IndexOf(':', result.IndexOf(':') + 1) + 1);
+                                        string[] tuples = resultNoCode.Split(',');
+                                        List<FilesViewItem> filesList = new List<FilesViewItem>();
+                                        foreach (string s in tuples) {
+                                            string[] filesColInfo = s.Split('^');
+                                            if (filesColInfo.Length > 1) {
+                                                string fileName = (filesColInfo[0].Split(':')[1]);
+                                                string fileSize = (filesColInfo[1].Split(':')[1]);
+                                                filesList.Add(new FilesViewItem { fileName = fileName, fileSize = fileSize });
+                                            }
+                                        }
+
+                                        return filesList;
+                                    } catch (Exception ex) {
+                                        Console.WriteLine(ex.Message);
+                                        return new List<FilesViewItem>();
+                                    }
+                                }, cts.Token);
+
+                                listView_Files.Items.Clear();
+                                List<FilesViewItem> files = await waitForFiles;
+                                foreach (var file in files) {
+                                    if (!listView_Files.Items.Contains(file))
+                                        listView_Files.Items.Add(file);
+                                }
+                            } catch (Exception ex) {
+                                Console.WriteLine(ex.Message);
+                            }
+                            break;
+                    }
+                    lastTabItem = item;
                 }
             }
         }

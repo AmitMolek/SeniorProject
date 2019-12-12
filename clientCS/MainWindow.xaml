@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:clientCS"
         mc:Ignorable="d"
         Title="MyBinPack" Width="360" Height="180" WindowStartupLocation="CenterScreen" Background="White">
-    <TabControl SelectionChanged="TabControl_SelectionChanged">
+    <TabControl x:Name="tabControl_tabs" SelectionChanged="TabControl_SelectionChangedAsync">
         <TabItem x:Name="tab_Upload" Header="Upload">
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                 <WrapPanel>
@@ -14,11 +14,18 @@
                     <Button x:Name="btnBrowse" Content="Browse" Click="btnBrowse_Click" Margin="5,0,0,0"/>
                 </WrapPanel>
                 <Button x:Name="btnUpload" Content="Upload" VerticalAlignment="Top" Click="btnSendFile_Click" Margin="0,15,0,0"/>
+                <Label x:Name="lblFileUploadStatus" HorizontalAlignment="Center"/>
             </StackPanel>
         </TabItem>
         <TabItem x:Name="tab_MyFiles" Header="My Files">
-            <ListView x:Name="listView_Files"/>
-
+            <ListView x:Name="listView_Files">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="File Name" DisplayMemberBinding="{Binding fileName}" Width="120"/>
+                        <GridViewColumn Header="File Size" DisplayMemberBinding="{Binding fileSize}" Width="80"/>
+                    </GridView>
+                </ListView.View>
+            </ListView>
         </TabItem>
     </TabControl>
 </Window>

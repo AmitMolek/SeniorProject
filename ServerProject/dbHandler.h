@@ -5,6 +5,7 @@
 #include <string>
 #include <filesystem>
 #include <utility>
+#include <vector>
 
 namespace fs = std::experimental::filesystem;
 
@@ -25,7 +26,7 @@ namespace dbHandler {
 		static void CloseDatabase();
 		static bool ExecQuery(std::string query);
 
-		static bool StoreFile(std::string fileName, fs::path filePath, std::string userName, fs::path storagePath,uint64_t fileSize);
+		static bool StoreFile(std::string fileName, fs::path filePath, std::string userName, fs::path storagePath, uint64_t fileSize);
 
 		bool InsertVContainer(std::string FolderName, uint64_t capacity, uint64_t usedCapacity);
 
@@ -39,6 +40,7 @@ namespace dbHandler {
 		bool retrieveContainers(std::vector<VContainer>& containersVector);
 		bool getNumOfContainers(unsigned int* count);
 		bool retrieveFiles(VContainer& parent, std::vector<VFile>* files, std::string folderName);
+		bool getListFiles(std::string username, std::vector<std::string>& results);
 	};
 	bool addFileToDB(std::string fileName, fs::path filePath,std:: string userName, fs::path storagePath);
 	void operator<<(Database& out, VContainer* container);

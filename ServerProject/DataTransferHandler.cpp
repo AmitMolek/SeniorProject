@@ -65,10 +65,25 @@ void DataTransferHandler::Thread_GetData(ConnectionInfo* con, FileUploadInfo fil
 			string st = VContainerName.string();
 			
 			db::Database::Instance().updateVcontainerUsedCapacity(st, outFile.fileSize);
-			((VContainer*)outFile.GetParent())->UseCapacity(outFile.fileSize);
+			VContainer* parentCont = (VContainer*)outFile.GetParent();
+			parentCont->UseCapacity(outFile.fileSize);
+			parentCont->files.push_back(std::move(outFile));
 			break;
 		}
 	}
 
 	ConsoleOutput() << "[INFO][" << con->clientAddress << "] Stopped handling client file " << fileInfo.fileName << "\n";
+}
+
+void DataTransferHandler::Thread_SendListFiles(ConnectionInfo* con) {
+	std::vector<std::string> results;
+	dbHandler::Database().getListFiles(con->username, results);
+	std::stringstream output;
+
+	output << "|pass:send_list_files:";
+	for (std::string s : results){
+		output << s << ",";
+	}
+
+	CommunicationHandler::SendBasicMsg(*con->dataSocket, output.str());
 }

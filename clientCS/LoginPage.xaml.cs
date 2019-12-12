@@ -23,7 +23,7 @@ namespace clientCS {
     /// </summary>
     public partial class LoginPage : Window {
 
-        const int waitForConnectionMs = 10000;
+        const int waitForConnectionMs = 5000;
         const string serverIP = "127.0.0.1";
         const int dataPort = 23456;
         const int instructionPort = 23457;
@@ -47,7 +47,10 @@ namespace clientCS {
                 try {
                     BaseClient connection = new BaseClient(serverIP, dataPort, instructionPort, username);
 
-                    while (!connection.getDataSocket().Connected) ;
+                    while (!connection.getDataSocket().Connected) {
+                        if (cts.IsCancellationRequested)
+                            throw new Exception("Login Timeout");
+                    }
 
                     return Tuple.Create(true, connection);
                 } catch (Exception ex) {
@@ -66,17 +69,16 @@ namespace clientCS {
                 dotCount = (dotCount + 1) % 4;
             };
             waitLblTimer.Start();
+            
             try {
                 var conn = await conTask;
-
+                waitLblTimer.Stop();
                 if (conn.Item1) {
                     share.connection = conn.Item2;
                     MainWindow main = new MainWindow(ref share);
                     main.Show();
-                    waitLblTimer.Stop();
                     this.Close();
                 } else {
-                    waitLblTimer.Stop();
                     lblWaitingConnection.Content = "Failed to connect";
                 }
             } catch (Exception ex) {

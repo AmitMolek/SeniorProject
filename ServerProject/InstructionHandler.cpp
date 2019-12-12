@@ -26,10 +26,10 @@ void InstructionHandler::Handle_Pass(Instruction ins, ConnectionInfo& con){
 		InstructionHandler::Handle_Pass_data_socket_id(ins ,con);
 	}else if (ins.code == "file_send"){
 		InstructionHandler::Handle_Pass_file_send(ins, con);
-	}
-	else if ((ins.code == "user_name"))
-	{
+	}else if ((ins.code == "user_name")){
 		InstructionHandler::Handle_Pass_user_name(ins, con);
+	} else if (ins.code == "get_list_files") {
+		InstructionHandler::Handle_Pass_Get_List_Files(ins, con);
 	}
 	
 }
@@ -55,6 +55,12 @@ void InstructionHandler::Handle_Pass_file_send(Instruction ins, ConnectionInfo& 
 	std::thread dataTransferThread(DataTransferHandler::Thread_GetData, &con, fileInfo);
 	dataTransferThread.detach();
 }
+
+void InstructionHandler::Handle_Pass_Get_List_Files(Instruction ins, ConnectionInfo& con){
+	std::thread getListThread(DataTransferHandler::Thread_SendListFiles, &con);
+	getListThread.detach();
+}
+
 void InstructionHandler::Handle_Pass_user_name(Instruction ins, ConnectionInfo& con) {
 	string userName = ins.content[0];
 	con.username = userName;
