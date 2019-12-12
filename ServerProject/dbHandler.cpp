@@ -5,7 +5,7 @@
 #include <utility>
 
 using namespace std;
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 namespace dbh = dbHandler;
 
 sqlite3* dbh::Database::db = nullptr;
@@ -224,6 +224,15 @@ bool dbh::Database::retrieveContainers(std::vector<VContainer>& containersVector
 	return true;
 }
 
+ void dbh::Database::setCurrentAlgorithm(std::string algoName)
+{
+	std::string sql = "UPDATE generalData SET currentAlgo = ' " + algoName + "';";
+		
+	int rc = sqlite3_exec(dbh::Database::Instance().db, sql.c_str(), NULL, NULL, NULL);
+
+	
+}
+
 static int getNumOfContainers_callback(void* param, int argc, char** argv, char** azColName)
 {
 	if (argc == 0) return 0;
@@ -263,3 +272,4 @@ bool dbh::Database::getNumOfContainers(unsigned int *count)
 
 	return true;
 }
+

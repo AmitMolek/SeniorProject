@@ -79,6 +79,8 @@ void VStorage::AllocateFiles(std::vector<std::pair<VFile&, FileUploadInfo&>> fil
 														input_files_weight_distribution,
 														max_items_in_container,
 														max_container_size);
+	db::Database::Instance().setCurrentAlgorithm(algo->GetName());
+	
 	for(auto& pair : files){
 		std::vector<uint64_t> containersFreeCapacity;
 		for (VContainer& cont : containers) {

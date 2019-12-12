@@ -7,7 +7,7 @@
 #include <utility>
 #include <vector>
 
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
 namespace dbHandler {
 	
@@ -38,6 +38,7 @@ namespace dbHandler {
 		friend void operator << (Database& out, std::pair<VFile*, ConnectionInfo*> uploadInfo);
 		//bool retrieveFiles(std::vector<VFile>& files, std::string folderName);
 		bool retrieveContainers(std::vector<VContainer>& containersVector);
+		void setCurrentAlgorithm(std::string containersVector);
 		bool getNumOfContainers(unsigned int* count);
 		bool retrieveFiles(VContainer& parent, std::vector<VFile>* files, std::string folderName);
 		bool getListFiles(std::string username, std::vector<std::string>& results);
