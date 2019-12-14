@@ -71,7 +71,7 @@ void DataTransferHandler::Thread_GetData(ConnectionInfo* con, FileUploadInfo fil
 			break;
 		}
 	}
-
+	CommunicationHandler::SendBasicMsg(*con->instructionSocket,"|pass:server_file_finish");
 	ConsoleOutput() << "[INFO][" << con->clientAddress << "] Stopped handling client file " << fileInfo.fileName << "\n";
 }
 
