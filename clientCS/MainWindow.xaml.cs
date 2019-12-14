@@ -186,15 +186,16 @@ namespace clientCS
             System.Windows.Forms.DialogResult result = dlg.ShowDialog();
             if (!string.IsNullOrWhiteSpace(dlg.SelectedPath))
             {
-                this.files = Directory.GetFiles(dlg.SelectedPath);
-
-                System.Windows.Forms.MessageBox.Show("Files found: " + files.Length.ToString(), "Message");
+                
+                txtFolderPath.Text = dlg.SelectedPath;
+             
             }
 
         }
 
         private void btnSendFolder_Click(object sender, RoutedEventArgs e)
         {
+            this.files = Directory.GetFiles(txtFolderPath.Text);
             foreach (string filePath in files)
             {
 
