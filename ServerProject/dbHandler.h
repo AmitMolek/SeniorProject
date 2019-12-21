@@ -42,6 +42,7 @@ namespace dbHandler {
 		bool getNumOfContainers(unsigned int* count);
 		bool retrieveFiles(VContainer& parent, std::vector<VFile>* files, std::string folderName);
 		bool getListFiles(std::string username, std::vector<std::string>& results);
+		bool getUserFilesPath(std::string username, std::vector<std::string>& results);
 	};
 	bool addFileToDB(std::string fileName, fs::path filePath,std:: string userName, fs::path storagePath);
 	void operator<<(Database& out, VContainer* container);

@@ -270,6 +270,16 @@ namespace client
             timer.Stop();
         }
 
+        public void sendGetFiles(List<string> filesNames) {
+            string instruction = "|pass:file_get:";
+            for (int i = 0; i < filesNames.Count() - 1; i++) {
+                instruction += filesNames[i] + ",";
+            }
+            instruction += filesNames[filesNames.Count() - 1];
+
+            instructionSocket.Send(Encoding.ASCII.GetBytes(instruction));
+        }
+
         public void sendUserName(string userName)
         {
             instructionSocket.Send(Encoding.ASCII.GetBytes((string)("|pass:user_name:" + userName)));

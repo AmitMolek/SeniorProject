@@ -15,5 +15,6 @@ private:
 	static void Handle_Pass_file_send(Instruction ins, ConnectionInfo& con);
 	static void Handle_Pass_user_name(Instruction ins, ConnectionInfo& con);
 	static void Handle_Pass_Get_List_Files(Instruction ins, ConnectionInfo& con);
+	static void Handle_Pass_file_get(Instruction ins, ConnectionInfo& con);
 };
 

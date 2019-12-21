@@ -28,6 +28,40 @@ int CommunicationHandler::SendBasicMsg(SOCKET& socket, std::string _msg){
 	return sentBytes;
 }
 
+bool CommunicationHandler::SendAllMsg(SOCKET& socket, const char _msg[], size_t length) {
+	size_t total = 0; // how many bytes we've sent
+	size_t bytesleft = length; // how many we have left to send
+	size_t n = 0;
+	while (total < length) {
+		n = send(socket, _msg + total, bytesleft, 0);
+		if (n == -1) {
+			/* print/log error details */
+			break;
+		}
+		total += n;
+		bytesleft -= n;
+	}
+
+	return n == -1 ? false : true; // return -1 on failure, 0 on success
+}
+
+bool CommunicationHandler::SendAllMsg(SOCKET& socket, std::string _msg) {
+	size_t total = 0; // how many bytes we've sent
+	int bytesleft = _msg.size(); // how many we have left to send
+	int n = 0;
+	while (total < _msg.size()) {
+		n = send(socket, _msg.c_str() + total, bytesleft, 0);
+		if (n == -1) {
+			/* print/log error details */
+			break;
+		}
+		total += n;
+		bytesleft -= n;
+	}
+
+	return n == -1 ? false : true; // return -1 on failure, 0 on success
+}
+
 void CommunicationHandler::ReceiveFile(SOCKET& socket, VFile& fileStream) {
 	
 }

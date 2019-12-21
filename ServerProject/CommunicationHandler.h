@@ -13,5 +13,7 @@ public:
 	static int SendBasicMsg(SOCKET& socket, std::string _msg);
 
 	static void ReceiveFile(SOCKET& socket, VFile& fileStream);
+	static bool SendAllMsg(SOCKET& socket, std::string _msg);
+	static bool SendAllMsg(SOCKET& socket, const char _msg[], size_t length);
 };
 

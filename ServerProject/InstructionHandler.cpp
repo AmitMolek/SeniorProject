@@ -30,6 +30,8 @@ void InstructionHandler::Handle_Pass(Instruction ins, ConnectionInfo& con){
 		InstructionHandler::Handle_Pass_user_name(ins, con);
 	} else if (ins.code == "get_list_files") {
 		InstructionHandler::Handle_Pass_Get_List_Files(ins, con);
+	}else if (ins.code == "file_get"){
+		InstructionHandler::Handle_Pass_file_get(ins, con);
 	}
 	
 }
@@ -64,6 +66,9 @@ void InstructionHandler::Handle_Pass_Get_List_Files(Instruction ins, ConnectionI
 void InstructionHandler::Handle_Pass_user_name(Instruction ins, ConnectionInfo& con) {
 	string userName = ins.content[0];
 	con.username = userName;
+}
 
-	
+void InstructionHandler::Handle_Pass_file_get(Instruction ins, ConnectionInfo& con){
+	std::thread sendFilesToClient(DataTransferHandler::Thread_SendFiles, &con, ins.content);
+	sendFilesToClient.detach();
 }

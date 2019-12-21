@@ -12,12 +12,22 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows.Threading;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Text;
+using System.Configuration;
+using System.Collections.Specialized;
+using System.Runtime.Caching;
 
 namespace clientCS
 {
     public class FilesViewItem {
         public string fileName { get; set; }
         public string fileSize { get; set; }
+        public bool isChecked { get; set; }
+        public int checkBoxId { get; set; }
+
+        public string downloadProgress { get; set; }
     }
 
     /// <summary>
@@ -37,6 +47,8 @@ namespace clientCS
             ftp = share.connection;
             pathsToUpload = new List<string>();
             InitializeComponent();
+
+            filesGridView.Columns[3].Width = 0;
         }
 
         
@@ -56,15 +68,15 @@ namespace clientCS
             string filePath = txtPath.Text;
 
             string connectionStr = "Uploading";
-            lblFileUploadStatus.Visibility = Visibility.Visible;
-            lblFileUploadStatus.Content = connectionStr;
+            btnUpload.IsEnabled = false;
+            btnUpload.Content = connectionStr;
             DispatcherTimer fileStatusLblTimer = new DispatcherTimer();
             fileStatusLblTimer.Interval = TimeSpan.FromMilliseconds(250);
             int dotCount = 1;
             fileStatusLblTimer.Tick += (sender1, args) => {
-                lblFileUploadStatus.Content = connectionStr;
+                btnUpload.Content = connectionStr;
                 for (int i = 0; i < dotCount; i++)
-                    lblFileUploadStatus.Content += ".";
+                    btnUpload.Content += ".";
                 dotCount = (dotCount + 1) % 4;
             };
             fileStatusLblTimer.Start();
@@ -73,7 +85,8 @@ namespace clientCS
                 await Task.Run(()=> {
                     task.Wait();
                 });
-                lblFileUploadStatus.Content = "Finished sending";
+                btnUpload.IsEnabled = true;
+                btnUpload.Content = "Upload";
             }), sendFile);
         }
 
@@ -114,6 +127,18 @@ namespace clientCS
             }
         }
 
+        public static List<int> AllIndexesOf(string str, string value) {
+            if (String.IsNullOrEmpty(value))
+                throw new ArgumentException("the string to find may not be empty", "value");
+            List<int> indexes = new List<int>();
+            for (int index = 0; ; index += value.Length) {
+                index = str.IndexOf(value, index);
+                if (index == -1)
+                    return indexes;
+                indexes.Add(index);
+            }
+        }
+
         private async void TabControl_SelectionChangedAsync(object sender, System.Windows.Controls.SelectionChangedEventArgs e) {
             var tc = sender as TabControl;
 
@@ -146,12 +171,14 @@ namespace clientCS
                                         string resultNoCode = result.Substring(result.IndexOf(':', result.IndexOf(':') + 1) + 1);
                                         string[] tuples = resultNoCode.Split(',');
                                         List<FilesViewItem> filesList = new List<FilesViewItem>();
+                                        int id = 0;
                                         foreach (string s in tuples) {
                                             string[] filesColInfo = s.Split('^');
                                             if (filesColInfo.Length > 1) {
                                                 string fileName = (filesColInfo[0].Split(':')[1]);
                                                 string fileSize = (filesColInfo[1].Split(':')[1]);
-                                                filesList.Add(new FilesViewItem { fileName = fileName, fileSize = fileSize });
+                                                filesList.Add(new FilesViewItem { fileName = fileName, fileSize = fileSize, isChecked = false, checkBoxId = id });
+                                                id++;
                                             }
                                         }
 
@@ -176,6 +203,135 @@ namespace clientCS
                     lastTabItem = item;
                 }
             }
+        }
+
+        public static int CountStringOccurrences(string text, string pattern) {
+            // Loop through all instances of the string 'text'.
+            int count = 0;
+            int i = 0;
+            while ((i = text.IndexOf(pattern, i)) != -1) {
+                i += pattern.Length;
+                count++;
+            }
+            return count;
+        }
+
+        string Convert(byte[] data) {
+            char[] characters = data.Select(b => (char)b).ToArray();
+            return new string(characters);
+        }
+
+        private void MyFiles_btnDownload_Click(object sender, RoutedEventArgs e) {
+            var allItems = listView_Files.Items;
+
+            var selectedItems = from FilesViewItem item in listView_Files.Items
+                                where item.isChecked == true
+                                select item;
+
+            List<string> filesToDownload = new List<string>();
+            foreach (var item in selectedItems) {
+                string fileInfo = item.fileName;
+                filesToDownload.Add(fileInfo);
+            }
+
+            if (filesToDownload.Count() > 0)
+                if (ftp != null) {
+                    ftp.sendGetFiles(filesToDownload);
+                }
+
+            CancellationTokenSource cts = new CancellationTokenSource();
+            cts.CancelAfter(20000);
+
+            DispatcherTimer fileStatusLblTimer = new DispatcherTimer();
+            fileStatusLblTimer.Interval = TimeSpan.FromMilliseconds(250);
+            int dotCount = 1;
+            fileStatusLblTimer.Tick += (sender1, args) => {
+                myFiles_btnDownload.IsEnabled = false;
+                myFiles_btnDownload.Content = "Downloading";
+                for (int i = 0; i < dotCount; i++)
+                    myFiles_btnDownload.Content += ".";
+                dotCount = (dotCount + 1) % 4;
+            };
+            fileStatusLblTimer.Start();
+
+            string file_end_str = "|pass:server_file_end";
+            string file_start_str = "|pass:server_file_start:";
+            Task downloadTask = Task.Factory.StartNew(() => {
+                try {
+                    Socket dataSoket = ftp.getDataSocket();
+                    while (dataSoket.Available < 0) {
+                        if (cts.IsCancellationRequested)
+                            throw new Exception("Timeout");
+                    }
+
+                    int totalbytes = 0;
+                    int bytesRecv = 0;
+                    StringBuilder totalData = new StringBuilder();
+                    MemoryStream ms = new MemoryStream();
+
+                    do {
+                        int bufferSize = 10 * 1024 * 1024;
+                        byte[] buffer = new byte[bufferSize];
+
+                        if ((bytesRecv = dataSoket.Receive(buffer)) > 0) {
+                            ms.Write(buffer, 0, bytesRecv);
+                            totalbytes += bytesRecv;
+                            totalData.Append(System.Text.Encoding.UTF8.GetString(buffer, 0, buffer.Length));
+                        }
+
+                    } while (CountStringOccurrences(totalData.ToString(), file_end_str) < filesToDownload.Count());
+
+                    byte[] totalByteData = ms.ToArray();
+
+                    totalData.Clear();
+                    ms.Close();
+
+                    string testStr = Convert(totalByteData);
+                    string[] totalFilesData = testStr.ToString().Split(new string[] { file_end_str }, StringSplitOptions.None);
+
+                    testStr = String.Empty;
+
+                    foreach (string fileData in totalFilesData) {
+                        if (fileData.Length > 0) {
+                            string dataWithName = fileData.Replace(file_start_str, "");
+                            int nameEndPos = dataWithName.IndexOf(':');
+                            string fileName = dataWithName.Substring(0, nameEndPos);
+                            string dataNoName = dataWithName.Replace(fileName + ":", "");
+
+                            dataWithName = String.Empty;
+
+                            string downloadsFolder = ConfigurationManager.AppSettings.Get("Downloads Folder");
+                            string filePath = Path.Combine("", downloadsFolder);
+                            Directory.CreateDirectory(filePath);
+                            filePath = Path.Combine(filePath, fileName);
+                            using (FileStream fs = new FileStream(filePath, FileMode.Create)) {
+                                fs.Write(dataNoName.Select(c => (byte)c).ToArray(), 0, dataNoName.Length);
+
+                                fs.Flush();
+                                fs.Close();
+                            }
+                        }
+                    }
+                } catch (Exception ex) {
+                    Console.WriteLine(ex.Message);
+                }
+
+            });
+
+            Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action<Task>(async (task) => {
+                await Task.Run(() => {
+                    task.Wait();
+                });
+                fileStatusLblTimer.Stop();
+                myFiles_btnDownload.Content = "Download";
+                myFiles_btnDownload.IsEnabled = true;
+            }), downloadTask);
+        }
+
+        private void MyFiles_btnDownloadFolder_Click(object sender, RoutedEventArgs e) {
+            string downloadFolder = ConfigurationManager.AppSettings.Get("Downloads Folder");
+            string folderPath = Path.Combine("", downloadFolder);
+            Process.Start(downloadFolder);
         }
     }
 }

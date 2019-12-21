@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:clientCS"
         mc:Ignorable="d"
-        Title="MyBinPack" Width="360" Height="180" WindowStartupLocation="CenterScreen" Background="White">
+        Title="MyBinPack" Width="720" Height="360" WindowStartupLocation="CenterScreen" Background="White">
     <TabControl x:Name="tabControl_tabs" SelectionChanged="TabControl_SelectionChangedAsync">
         <TabItem x:Name="tab_Upload" Header="Upload">
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -18,14 +18,36 @@
             </StackPanel>
         </TabItem>
         <TabItem x:Name="tab_MyFiles" Header="My Files">
-            <ListView x:Name="listView_Files">
-                <ListView.View>
-                    <GridView>
-                        <GridViewColumn Header="File Name" DisplayMemberBinding="{Binding fileName}" Width="120"/>
-                        <GridViewColumn Header="File Size" DisplayMemberBinding="{Binding fileSize}" Width="80"/>
-                    </GridView>
-                </ListView.View>
-            </ListView>
+            <StackPanel>
+                <ListView x:Name="listView_Files" Height="260">
+                    <DataTemplate x:Name="CheckBoxColumn">
+                        <CheckBox IsChecked="False"></CheckBox>
+                    </DataTemplate>
+                    <ListView.View>
+                        <GridView x:Name="filesGridView">
+                            <GridViewColumn Header="" Width="30">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <CheckBox IsChecked="{Binding isChecked}" Content="{Binding checkBoxId}" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="File Name" DisplayMemberBinding="{Binding fileName}" Width="200"/>
+                            <GridViewColumn Header="File Size" DisplayMemberBinding="{Binding fileSize}" Width="140"/>
+                            <GridViewColumn Header="Progress" DisplayMemberBinding="{Binding downloadProgress}" Width="140" />
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+                <WrapPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,5,0,0">
+                    <WrapPanel.Resources>
+                        <Style TargetType="{x:Type Button}">
+                            <Setter Property="Margin" Value="25,0" />
+                        </Style>
+                    </WrapPanel.Resources>
+                    <Button x:Name="myFiles_btnDownload" Content="Download" Width="140" Height="25" Click="MyFiles_btnDownload_Click"/>
+                    <Button x:Name="myFiles_btnDownloadFolder" Content="Open Downloads" Width="140" Height="25" Click="MyFiles_btnDownloadFolder_Click"/>
+                </WrapPanel>
+            </StackPanel>
         </TabItem>
     </TabControl>
 </Window>
