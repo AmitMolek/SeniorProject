@@ -49,5 +49,16 @@
                 </WrapPanel>
             </StackPanel>
         </TabItem>
+
+        <TabItem x:Name="tab_Upload_Folder" Header="Upload Folder">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <WrapPanel>
+                    <TextBox x:Name="txtFolderPath" Width="240"/>
+                    <Button x:Name="btnBrowseFolder" Content="Browse" Click="btnBrowseFolder_Click" Margin="5,0,0,0"/>
+                </WrapPanel>
+                <Button x:Name="btnUpload1" Content="Upload all files in folder" VerticalAlignment="Top" Click="btnSendFolder_Click" Margin="0,15,0,0"/>
+            </StackPanel>
+
+        </TabItem>
     </TabControl>
 </Window>

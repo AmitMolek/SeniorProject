@@ -19,6 +19,7 @@ using System.Configuration;
 using System.Collections.Specialized;
 using System.Runtime.Caching;
 
+
 namespace clientCS
 {
     public class FilesViewItem {
@@ -38,7 +39,7 @@ namespace clientCS
 
         //static  BaseClient ftp;
         BaseClient ftp;
-
+        public string[] files;
         TabItem lastTabItem;
         List<string> pathsToUpload;
 
@@ -202,6 +203,52 @@ namespace clientCS
                     }
                     lastTabItem = item;
                 }
+            }
+        }
+
+        private void btnBrowseFolder_Click(object sender, RoutedEventArgs e)
+        {
+
+            var dlg = new System.Windows.Forms.FolderBrowserDialog();
+            System.Windows.Forms.DialogResult result = dlg.ShowDialog();
+            if (!string.IsNullOrWhiteSpace(dlg.SelectedPath))
+            {
+                
+                txtFolderPath.Text = dlg.SelectedPath;
+             
+            }
+
+        }
+
+        private void btnSendFolder_Click(object sender, RoutedEventArgs e)
+        {
+            this.files = Directory.GetFiles(txtFolderPath.Text);
+            foreach (string filePath in files)
+            {
+
+                string connectionStr = "Uploading";
+                lblFileUploadStatus.Visibility = Visibility.Visible;
+                lblFileUploadStatus.Content = connectionStr;
+                DispatcherTimer fileStatusLblTimer = new DispatcherTimer();
+                fileStatusLblTimer.Interval = TimeSpan.FromMilliseconds(250);
+                int dotCount = 1;
+                fileStatusLblTimer.Tick += (sender1, args) => {
+                    lblFileUploadStatus.Content = connectionStr;
+                    for (int i = 0; i < dotCount; i++)
+                        lblFileUploadStatus.Content += ".";
+                    dotCount = (dotCount + 1) % 4;
+                };
+                fileStatusLblTimer.Start();
+                ftp.sendFile(filePath, ref fileStatusLblTimer);
+
+                /*Task sendFile = Task.Factory.StartNew(() => { ftp.sendFile(filePath, ref fileStatusLblTimer); });
+                Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action<Task>(async (task) => {
+                    await Task.Run(() => {
+                        task.Wait();
+                    });
+                    lblFileUploadStatus.Content = "Finished sending";
+                }), sendFile);*/
+              
             }
         }
 

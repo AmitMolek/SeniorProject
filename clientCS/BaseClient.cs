@@ -23,10 +23,10 @@ namespace client
         private int dataPort;
         private int instructionPort;
         private String userName;
-
-        public BaseClient(String _serverAddress, int _dataPort, int _instructionPort,string _userName)
+        private static Semaphore m;
+        public BaseClient(String _serverAddress, int _dataPort, int _instructionPort, string _userName)
         {
-           
+
             dataSocket = null;
             instructionSocket = null;
 
@@ -35,39 +35,49 @@ namespace client
             instructionPort = _instructionPort;
             userName = _userName;
 
+            m = new Semaphore(1, 1);
+
             GetInstructionSocket();
 
-
+            
             GetDataSocket();
 
-            Thread t = new Thread(() => {
-                try {
+            Thread t = new Thread(() =>
+            {
+                try
+                {
                     connectClient();
-                }catch (Exception ex) {
+                }
+                catch (Exception ex)
+                {
                     Console.WriteLine(ex.Message);
                 }
 
-            } );
+            });
             t.IsBackground = true;
             t.Start();
 
-            
-           //Thread.Sleep(3000);
-            
+
+            //Thread.Sleep(3000);
+
             //sendUserName(userName);
             //ConnectDataSocket();
 
             // while (true) ;
         }
 
-        public BaseClient() {
+        public BaseClient()
+        {
         }
 
         public void connectClient()
         {
-            try {
+            try
+            {
                 ConnectInstructionSocket();
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 throw (ex);
             }
         }
@@ -153,8 +163,8 @@ namespace client
         {
             int receivedBytes = -1;
             int instructionBytesCounter = 0;
-            
-            
+
+
 
 
             int dataBytesCounter = 0;
@@ -234,6 +244,11 @@ namespace client
 
                                     sendUserName(userName);
                                 }
+                                if (splitInstructions[1] == "server_file_finish")
+                                {
+                                    m.Release(1);
+                                    int t = 0;
+                                }
                             }
                         }
                     }
@@ -249,11 +264,12 @@ namespace client
             int bytes = 0;
             int bytesToSend = 0;
             byte[] dataBuffer = new byte[INSTRUCTION_BUFFER_SIZE];
-
+            
+             m.WaitOne();
             fileSize = new System.IO.FileInfo(fileName).Length;
             splitMsg = fileName.Split('\\');
-            Console.WriteLine((string)("|pass:file_send:" + splitMsg [splitMsg.Length-1] + "," + fileSize));
-            instructionSocket.Send(Encoding.ASCII.GetBytes((string)("|pass:file_send:" + splitMsg[splitMsg.Length - 1] + "," + fileSize)),0);
+            Console.WriteLine((string)("|pass:file_send:" + splitMsg[splitMsg.Length - 1] + "," + fileSize));
+            instructionSocket.Send(Encoding.ASCII.GetBytes((string)("|pass:file_send:" + splitMsg[splitMsg.Length - 1] + "," + fileSize)), 0);
 
             FileStream input = File.OpenRead(fileName);
             dataSocket.Send(Encoding.ASCII.GetBytes("|pass:file_start"), 0);
@@ -263,11 +279,12 @@ namespace client
                 bytesToSend += bytes;
                 dataSocket.Send(dataBuffer, bytes, 0);
 
-                bytesToSend = 0; 
+                bytesToSend = 0;
             }
             dataSocket.Send(Encoding.ASCII.GetBytes("|pass:file_end"), 0);
             input.Close();
             timer.Stop();
+            
         }
 
         public void sendGetFiles(List<string> filesNames) {
@@ -283,14 +300,51 @@ namespace client
         public void sendUserName(string userName)
         {
             instructionSocket.Send(Encoding.ASCII.GetBytes((string)("|pass:user_name:" + userName)));
-           
+
         }
 
-        public void sendGetListFiles() {
+        public void sendGetListFiles()
+        {
             string instruction = "|pass:get_list_files";
             instructionSocket.Send(Encoding.ASCII.GetBytes(instruction));
         }
-    }
+        public void waitForServerEndFile()
+        {
+            int instructionBytesCounter;
+            int receivedBytes;
+            string receivedMsg = ""; /* will be in use to savethe whole msg*/
+            bool ack = false;
+            while (ack == false)
+            {
+                instructionBytesCounter = 0;
+                while (instructionSocket.Available > 0)
+                {
+                    byte[] instructionBuffer = new byte[INSTRUCTION_BUFFER_SIZE];
+                    receivedBytes = instructionSocket.Receive(instructionBuffer, instructionBuffer.Length, 0);
+                    Debug.WriteLine("start reading instruction");
+                    instructionBytesCounter += receivedBytes;
+                    receivedMsg += instructionBuffer;/* will be in use to savethe whole msg*/
 
-   
+                    string converted = Encoding.UTF8.GetString(instructionBuffer, 0, receivedBytes);
+
+                    string[] splitMsg = converted.Split('|');
+
+                    foreach (string instruction in splitMsg)
+                    {
+                        string[] splitInstructions = instruction.Split(':');
+                        if (splitInstructions.Length > 0)
+                        {
+                            if (splitInstructions[0] == "pass")
+                            {
+                                Console.WriteLine("splitInstructions[0] == \"pass\"");
+                                Console.WriteLine(splitInstructions[1]);
+                               
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+    }
 }
