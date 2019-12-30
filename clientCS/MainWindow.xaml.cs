@@ -5,23 +5,17 @@ using System.Threading;
 using System;
 using Microsoft.Win32;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Threading.Tasks;
 using System.Net.Sockets;
 using System.Diagnostics;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Windows.Threading;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Text;
 using System.Configuration;
-using System.Collections.Specialized;
-using System.Runtime.Caching;
 
 
-namespace clientCS
-{
+namespace clientCS {
     public class FilesViewItem {
         public string fileName { get; set; }
         public string fileSize { get; set; }
@@ -225,8 +219,29 @@ namespace clientCS
             this.files = Directory.GetFiles(txtFolderPath.Text);
             foreach (string filePath in files)
             {
-
                 string connectionStr = "Uploading";
+                btnUploadFolder.IsEnabled = false;
+                btnUploadFolder.Content = connectionStr;
+                DispatcherTimer fileStatusLblTimer = new DispatcherTimer();
+                fileStatusLblTimer.Interval = TimeSpan.FromMilliseconds(250);
+                int dotCount = 1;
+                fileStatusLblTimer.Tick += (sender1, args) => {
+                    btnUploadFolder.Content = connectionStr;
+                    for (int i = 0; i < dotCount; i++)
+                        btnUploadFolder.Content += ".";
+                    dotCount = (dotCount + 1) % 4;
+                };
+                fileStatusLblTimer.Start();
+                Task sendFile = Task.Factory.StartNew(() => { ftp.sendFile(filePath, ref fileStatusLblTimer); });
+                Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action<Task>(async (task) => {
+                    await Task.Run(() => {
+                        task.Wait();
+                    });
+                    btnUploadFolder.IsEnabled = true;
+                    btnUploadFolder.Content = "Upload";
+                }), sendFile);
+
+                /*string connectionStr = "Uploading";
                 lblFileUploadStatus.Visibility = Visibility.Visible;
                 lblFileUploadStatus.Content = connectionStr;
                 DispatcherTimer fileStatusLblTimer = new DispatcherTimer();
@@ -241,7 +256,7 @@ namespace clientCS
                 fileStatusLblTimer.Start();
                 ftp.sendFile(filePath, ref fileStatusLblTimer);
 
-                /*Task sendFile = Task.Factory.StartNew(() => { ftp.sendFile(filePath, ref fileStatusLblTimer); });
+                Task sendFile = Task.Factory.StartNew(() => { ftp.sendFile(filePath, ref fileStatusLblTimer); });
                 Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action<Task>(async (task) => {
                     await Task.Run(() => {
                         task.Wait();
@@ -281,10 +296,11 @@ namespace clientCS
                 filesToDownload.Add(fileInfo);
             }
 
-            if (filesToDownload.Count() > 0)
+            if (filesToDownload.Count() > 0) {
                 if (ftp != null) {
                     ftp.sendGetFiles(filesToDownload);
                 }
+            } else return;
 
             CancellationTokenSource cts = new CancellationTokenSource();
             cts.CancelAfter(20000);

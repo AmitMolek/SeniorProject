@@ -5,21 +5,30 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:clientCS"
         mc:Ignorable="d"
-        Title="MyBinPack" Width="720" Height="360" WindowStartupLocation="CenterScreen" Background="White">
-    <TabControl x:Name="tabControl_tabs" SelectionChanged="TabControl_SelectionChangedAsync">
+        Title="MyBinPack" Width="720" Height="380" WindowStartupLocation="CenterScreen" Background="White">
+    <TabControl x:Name="tabControl_tabs" SelectionChanged="TabControl_SelectionChangedAsync" Background="White" BorderBrush="#FF8B9DC3">
         <TabItem x:Name="tab_Upload" Header="Upload">
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                 <WrapPanel>
-                    <TextBox x:Name="txtPath" Width="240"/>
-                    <Button x:Name="btnBrowse" Content="Browse" Click="btnBrowse_Click" Margin="5,0,0,0"/>
+                    <TextBox x:Name="txtPath" Padding="0,5,0,0" Height="30" Width="240" TextWrapping="Wrap" VerticalAlignment="Center" IsEnabled="False"/>
+                    <Button x:Name="btnBrowse" Content="Browse" Click="btnBrowse_Click" Margin="5,0,0,0" Height="30" Width="60"/>
                 </WrapPanel>
-                <Button x:Name="btnUpload" Content="Upload" VerticalAlignment="Top" Click="btnSendFile_Click" Margin="0,15,0,0"/>
-                <Label x:Name="lblFileUploadStatus" HorizontalAlignment="Center"/>
+                <Button x:Name="btnUpload" Content="Upload" VerticalAlignment="Top" Click="btnSendFile_Click" Margin="0,15,0,0" Width="80" Height="30"/>
+                <!--<Label x:Name="lblFileUploadStatus" HorizontalAlignment="Center"/>-->
+            </StackPanel>
+        </TabItem>
+        <TabItem x:Name="tab_Upload_Folder" Header="Upload Folder">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <WrapPanel>
+                    <TextBox x:Name="txtFolderPath" Padding="0,5,0,0" Height="30" Width="240" TextWrapping="Wrap" VerticalAlignment="Center"  IsEnabled="False"/>
+                    <Button x:Name="btnBrowseFolder" Content="Browse" Click="btnBrowseFolder_Click" Margin="5,0,0,0" Height="30" Width="60"/>
+                </WrapPanel>
+                <Button x:Name="btnUploadFolder" Content="Upload" VerticalAlignment="Top" Click="btnSendFolder_Click" Margin="0,15,0,0" Width="80" Height="30"/>
             </StackPanel>
         </TabItem>
         <TabItem x:Name="tab_MyFiles" Header="My Files">
             <StackPanel>
-                <ListView x:Name="listView_Files" Height="260">
+                <ListView x:Name="listView_Files" Height="260" Foreground="#3b5998">
                     <DataTemplate x:Name="CheckBoxColumn">
                         <CheckBox IsChecked="False"></CheckBox>
                     </DataTemplate>
@@ -38,27 +47,11 @@
                         </GridView>
                     </ListView.View>
                 </ListView>
-                <WrapPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,5,0,0">
-                    <WrapPanel.Resources>
-                        <Style TargetType="{x:Type Button}">
-                            <Setter Property="Margin" Value="25,0" />
-                        </Style>
-                    </WrapPanel.Resources>
-                    <Button x:Name="myFiles_btnDownload" Content="Download" Width="140" Height="25" Click="MyFiles_btnDownload_Click"/>
-                    <Button x:Name="myFiles_btnDownloadFolder" Content="Open Downloads" Width="140" Height="25" Click="MyFiles_btnDownloadFolder_Click"/>
+                <WrapPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,8,0,0">
+                    <Button x:Name="myFiles_btnDownload" Content="Download" Width="140" Height="30" Click="MyFiles_btnDownload_Click"/>
+                    <Button x:Name="myFiles_btnDownloadFolder" Content="Open Downloads" Width="140" Height="30" Margin="50,0,0,0" Click="MyFiles_btnDownloadFolder_Click"/>
                 </WrapPanel>
             </StackPanel>
-        </TabItem>
-
-        <TabItem x:Name="tab_Upload_Folder" Header="Upload Folder">
-            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                <WrapPanel>
-                    <TextBox x:Name="txtFolderPath" Width="240"/>
-                    <Button x:Name="btnBrowseFolder" Content="Browse" Click="btnBrowseFolder_Click" Margin="5,0,0,0"/>
-                </WrapPanel>
-                <Button x:Name="btnUpload1" Content="Upload all files in folder" VerticalAlignment="Top" Click="btnSendFolder_Click" Margin="0,15,0,0"/>
-            </StackPanel>
-
         </TabItem>
     </TabControl>
 </Window>
