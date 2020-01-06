@@ -14,7 +14,7 @@ namespace client
 
     public class BaseClient
     {
-        public const int INSTRUCTION_BUFFER_SIZE = 1024;
+        public const int INSTRUCTION_BUFFER_SIZE = 1024 * 5;
 
         private Socket dataSocket;
         private Socket instructionSocket;
@@ -273,7 +273,7 @@ namespace client
 
             FileStream input = File.OpenRead(fileName);
             dataSocket.Send(Encoding.ASCII.GetBytes("|pass:file_start"), 0);
-
+            Console.WriteLine("Sent file start for: " + fileName);
             while ((bytes = input.Read(dataBuffer, 0, dataBuffer.Length)) > 0)
             {
                 bytesToSend += bytes;
@@ -281,7 +281,9 @@ namespace client
 
                 bytesToSend = 0;
             }
-            dataSocket.Send(Encoding.ASCII.GetBytes("|pass:file_end"), 0);
+            byte[] endFileStr = Encoding.ASCII.GetBytes("|pass:file_end");
+            dataSocket.Send(endFileStr, 0);
+            Console.WriteLine("Sent file end for: " + fileName);
             input.Close();
             timer.Stop();
             

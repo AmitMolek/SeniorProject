@@ -160,20 +160,24 @@ namespace clientCS {
 
                                         const int bufferSize = 1024;
                                         byte[] buffer = new byte[bufferSize];
-                                        dataSoket.Receive(buffer);
-
-                                        string result = System.Text.Encoding.ASCII.GetString(buffer);
-                                        string resultNoCode = result.Substring(result.IndexOf(':', result.IndexOf(':') + 1) + 1);
-                                        string[] tuples = resultNoCode.Split(',');
                                         List<FilesViewItem> filesList = new List<FilesViewItem>();
-                                        int id = 0;
-                                        foreach (string s in tuples) {
-                                            string[] filesColInfo = s.Split('^');
-                                            if (filesColInfo.Length > 1) {
-                                                string fileName = (filesColInfo[0].Split(':')[1]);
-                                                string fileSize = (filesColInfo[1].Split(':')[1]);
-                                                filesList.Add(new FilesViewItem { fileName = fileName, fileSize = fileSize, isChecked = false, checkBoxId = id });
-                                                id++;
+                                        // TODO: KEEP LISTENING FOR DATA WHILE YOU CAN (availiable)
+                                        while (dataSoket.Available > 0) {
+                                            dataSoket.Receive(buffer);
+
+                                            string result = System.Text.Encoding.ASCII.GetString(buffer);
+                                            string resultNoCode = result.Substring(result.IndexOf(':', result.IndexOf(':') + 1) + 1);
+                                            string[] tuples = resultNoCode.Split(',');
+                                            
+                                            int id = 0;
+                                            foreach (string s in tuples) {
+                                                string[] filesColInfo = s.Split('^');
+                                                if (filesColInfo.Length > 1) {
+                                                    string fileName = (filesColInfo[0].Split(':')[1]);
+                                                    string fileSize = (filesColInfo[1].Split(':')[1]);
+                                                    filesList.Add(new FilesViewItem { fileName = fileName, fileSize = fileSize, isChecked = false, checkBoxId = id });
+                                                    id++;
+                                                }
                                             }
                                         }
 
@@ -217,6 +221,7 @@ namespace clientCS {
         private void btnSendFolder_Click(object sender, RoutedEventArgs e)
         {
             this.files = Directory.GetFiles(txtFolderPath.Text);
+            Task sendFile = null;
             foreach (string filePath in files)
             {
                 string connectionStr = "Uploading";
@@ -232,7 +237,9 @@ namespace clientCS {
                     dotCount = (dotCount + 1) % 4;
                 };
                 fileStatusLblTimer.Start();
-                Task sendFile = Task.Factory.StartNew(() => { ftp.sendFile(filePath, ref fileStatusLblTimer); });
+                if (sendFile != null)
+                    sendFile.Wait();
+                sendFile = Task.Factory.StartNew(() => { ftp.sendFile(filePath, ref fileStatusLblTimer); });
                 Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action<Task>(async (task) => {
                     await Task.Run(() => {
                         task.Wait();

@@ -6,7 +6,7 @@
 #include <vector>
 #include <string>
 
-constexpr int BUFFER_SIZE = 1024;
+constexpr int BUFFER_SIZE = 16384 - 36;
 
 std::pair<int, std::string> CommunicationHandler::ReceiveMsg(SOCKET& socket) {
 	int receivedBytes = -1;
@@ -17,6 +17,9 @@ std::pair<int, std::string> CommunicationHandler::ReceiveMsg(SOCKET& socket) {
 	if (receivedBytes == -1)
 		return std::make_pair(receivedBytes, "");
 
+	if (receivedBytes == 9) {
+		std::string cunt = std::string(buffer, buffer + receivedBytes);
+	}
 	return std::make_pair(receivedBytes, std::string(buffer, buffer + receivedBytes));
 }
 

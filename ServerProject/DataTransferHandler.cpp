@@ -29,7 +29,11 @@ void DataTransferHandler::Thread_GetData(ConnectionInfo* con, FileUploadInfo fil
 	VFile outFile;
 	con->storage->AllocateFiles({ {outFile, fileInfo} });
 
-	ConsoleOutput() << "[INFO][" << con->clientAddress << "] Started handling client file " << outFile << "\n";
+	if (con) {
+		ConsoleOutput() << "[INFO][" << con->clientAddress << "] Started handling client file " << outFile << "\n";
+	} else {
+		return;
+	}
 	CommunicationHandler::SendBasicMsg(*con->instructionSocket, "|pass:server_wait_on_file");
 
 	string fileStartInstruction = "|pass:file_start";
@@ -38,7 +42,12 @@ void DataTransferHandler::Thread_GetData(ConnectionInfo* con, FileUploadInfo fil
 	bool isSendStart = false;
 	bool isSendEnd = false;
 
+	if (fileInfo.fileName == "160.txt"){
+		ConsoleOutput() << "" << std::endl;
+	}
+
 	while ((msgInfo = CommunicationHandler::ReceiveMsg(*con->dataSocket)).first != -1){
+		//ConsoleOutput() << msgInfo.second << "\n";
 		string msg = msgInfo.second;
 		size_t fileStartPos = msg.find(fileStartInstruction);
 		size_t fileEndPos = msg.find(fileEndInstruction);
@@ -50,6 +59,7 @@ void DataTransferHandler::Thread_GetData(ConnectionInfo* con, FileUploadInfo fil
 			outFile.OpenFileStream();
 		}
 		if (fileEndPos != std::string::npos) {
+			//ConsoleOutput() << "Found file end!" << std::endl;
 			if (fileStartPos != std::string::npos)
 				msg.erase(fileEndPos - fileStartInstruction.size(), fileEndInstruction.size());
 			else msg.erase(fileEndPos, fileEndInstruction.size());
