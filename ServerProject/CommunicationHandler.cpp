@@ -6,21 +6,22 @@
 #include <vector>
 #include <string>
 
-constexpr int BUFFER_SIZE = 16384 - 36;
+constexpr int BUFFER_SIZE = 16384 * 4;
 
 std::pair<int, std::string> CommunicationHandler::ReceiveMsg(SOCKET& socket) {
 	int receivedBytes = -1;
-	char buffer[BUFFER_SIZE];
+	//char buffer[BUFFER_SIZE];
+
+	char* buffer = new char[BUFFER_SIZE];
 
 	receivedBytes = recv(socket, buffer, BUFFER_SIZE, 0);
 
 	if (receivedBytes == -1)
 		return std::make_pair(receivedBytes, "");
 
-	if (receivedBytes == 9) {
-		std::string cunt = std::string(buffer, buffer + receivedBytes);
-	}
 	return std::make_pair(receivedBytes, std::string(buffer, buffer + receivedBytes));
+
+	delete[] buffer;
 }
 
 int CommunicationHandler::SendBasicMsg(SOCKET& socket, std::string _msg){

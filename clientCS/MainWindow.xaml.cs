@@ -158,11 +158,17 @@ namespace clientCS {
                                                 throw new Exception("Timeout");
                                         }
 
-                                        const int bufferSize = 1024;
+                                        const int bufferSize = 1024 * 1024 * 5;
                                         byte[] buffer = new byte[bufferSize];
                                         List<FilesViewItem> filesList = new List<FilesViewItem>();
                                         // TODO: KEEP LISTENING FOR DATA WHILE YOU CAN (availiable)
-                                        while (dataSoket.Available > 0) {
+
+                                        while (dataSoket.Available < 0) {
+                                            if (cts.IsCancellationRequested)
+                                                throw new Exception("Timeout");
+                                        }
+
+                                        //while (dataSoket.Available > 0) {
                                             dataSoket.Receive(buffer);
 
                                             string result = System.Text.Encoding.ASCII.GetString(buffer);
@@ -179,7 +185,7 @@ namespace clientCS {
                                                     id++;
                                                 }
                                             }
-                                        }
+                                        //}
 
                                         return filesList;
                                     } catch (Exception ex) {

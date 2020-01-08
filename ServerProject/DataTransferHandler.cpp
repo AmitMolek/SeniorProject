@@ -42,10 +42,6 @@ void DataTransferHandler::Thread_GetData(ConnectionInfo* con, FileUploadInfo fil
 	bool isSendStart = false;
 	bool isSendEnd = false;
 
-	if (fileInfo.fileName == "160.txt"){
-		ConsoleOutput() << "" << std::endl;
-	}
-
 	while ((msgInfo = CommunicationHandler::ReceiveMsg(*con->dataSocket)).first != -1){
 		//ConsoleOutput() << msgInfo.second << "\n";
 		string msg = msgInfo.second;
@@ -101,15 +97,7 @@ void DataTransferHandler::Thread_SendListFiles(ConnectionInfo* con) {
 	}
 
 	CommunicationHandler::SendBasicMsg(*con->dataSocket, output.str());
-}
-
-bool SkipBOM(std::istream& in) {
-	char test[4] = { 0 };
-	in.read(test, 3);
-	if (strcmp(test, "\xEF\xBB\xBF") == 0)
-		return true;
-	in.seekg(0);
-	return false;
+	ConsoleOutput() << "[INFO][" << con->clientAddress << "]" << " Sent files list [" << results.size() << "] to client" << std::endl;
 }
 
 void DataTransferHandler::Thread_SendFiles(ConnectionInfo* con, std::vector<std::string> filesNames) {
