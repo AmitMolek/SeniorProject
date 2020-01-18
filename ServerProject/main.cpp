@@ -29,7 +29,7 @@ int main() {
 	size_t container_size = 10;
 	size_t max_items_in_container = 10;
 	
-	VStorage virtualStorage(virtualStorageRoot, { &ff, &nf }, true);
+	VStorage virtualStorage(virtualStorageRoot, { &ff, &nf ,&bf }, true);
 	virtualStorage.SetSystemParams(files_distribution, 
 								   max_items_in_container, 
 								   container_size);

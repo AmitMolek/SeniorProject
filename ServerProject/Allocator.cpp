@@ -4,7 +4,7 @@
 #define MAX_INPUT_WEIGHT 10
 #define MAX_ITEMS_IN_BIN 10
 #define MAX_BIN_SIZE 10
-
+#define SERIES_LEGTH  2
 //VContainer* Allocator::AllocateContainer(unsigned long long int fileSize, std::vector<IBPAlgorithm*> algorithms, std::vector<VContainer>& containers, size_t input_length) {
 //	IBPAlgorithm* storageAlgo = Allocator::GetStorageAlgorithm(algorithms, input_length);
 //	std::vector<unsigned long long int> freeCapacity;
@@ -54,4 +54,47 @@ std::vector<std::pair<IBPAlgorithm*, double>> Allocator::CalculateMeans(
 														max_bin_size)});
 
 	return meanValues;
+}
+
+
+ IBPAlgorithm* Allocator:: GetStorageAlgorithmBySeries(std::vector<VContainer> &containers, std::vector<IBPAlgorithm*> algorithms)
+{
+	 
+	int ans = 0, anchor = 0;
+	uint64_t iMinus1usedCapacity;
+	uint64_t iusedCapacity;
+	for (int i = 0; i < containers.size(); ++i)
+	{
+		if (i > 0)
+		{
+			iMinus1usedCapacity = containers[i - 1].capacity - containers[i - 1].GetFreeCapacity();
+			iusedCapacity = containers[i].capacity - containers[i].GetFreeCapacity();
+		}
+		
+		if (i > 0 && iMinus1usedCapacity >= iusedCapacity) anchor = i;
+		ans = std::max(ans, i - anchor + 1);
+	}
+	if (ans >= SERIES_LEGTH)
+	{
+		for (int i = 0; i < algorithms.size(); i++)
+		{
+			if (algorithms[i]->GetName()._Equal("BestFit"))
+			{
+				return algorithms[i];
+			}
+		}
+
+	}
+	else
+	{
+		for (int i = 0; i < algorithms.size(); i++)
+		{
+			if (algorithms[i]->GetName()._Equal("FirstFit"))
+			{
+				return algorithms[i];
+			}
+		}
+	}
+		
+	 
 }

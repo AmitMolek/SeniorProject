@@ -76,12 +76,38 @@ def getUsedCapacity(conn):
     freeCapacity = usedCapacity[0][0]
     return freeCapacity
 
+def getUsedAlgorithm(conn):
+    cur = conn.cursor()
+    cur.execute("SELECT currentAlgo FROM generalData")
+    currentAlgo = cur.fetchall()
+    currentAlgo = currentAlgo[0][0]
+    return currentAlgo
+
+
+def create_card(title, content):
+    card = dbc.Card(
+        dbc.CardBody(
+            [
+                html.H4(title, className="card-title"),
+                html.Br(),
+                html.Br(),
+                html.Div(html.H2(content, className="card-subtitle", id='Current'),id = 'currentDiv'),
+                html.Br(),
+                html.Br(),
+                ]
+        ),
+        color="info", inverse=False
+    )
+    return card
+
+
 oldNumberOfFolders =0
 colors = []
+usedAlgorithm = ""
 if __name__ == '__main__':
     conn = create_connection()
     numberOfContainers = getNumberOfContainers (conn)
-    if oldNumberOfFolders !=numberOfContainers:
+    if oldNumberOfFolders != numberOfContainers:
         colors = []
         for i in range(numberOfContainers):
             color = "%06x" % random.randint(0, 0xFFFFFF)
@@ -95,8 +121,10 @@ if __name__ == '__main__':
     freeCapacity.append(getFreeCapacity(conn))
     freeCapacityValue = getFreeCapacity(conn)
     usedCapacity = getUsedCapacity(conn)
-    dataForPieChart = [freeCapacityValue,usedCapacity]
+    dataForPieChart = [freeCapacityValue, usedCapacity]
+    usedAlgorithm = getUsedAlgorithm(conn)
 
+usedAlgorithmCard = create_card("Current Algorithm", usedAlgorithm)
 usedCapacityBar = dcc.Graph(
         id = "usedCapacityBar",
         figure ={
@@ -176,7 +204,6 @@ numberOfFolders = dcc.Graph(
 )
 
 
-
 freeSpaceGraph = dcc.Graph(
         id = "sizes",
         figure ={
@@ -189,7 +216,7 @@ freeSpaceGraph = dcc.Graph(
 
                   }],
                 "layout": {
-                      "title" : dict(text ="number of folders",
+                      "title" : dict(text ="free capacity",
                                      font =dict(
                                      size=20,
                                      color = 'white')),
@@ -241,7 +268,7 @@ usedCapacityPie = dcc.Graph(
 
 
 graphRow0 = dbc.Row([ dbc.Col(usedCapacityBar, md=6),dbc.Col(freeSpaceGraph, md=6)])
-graphRow1 = dbc.Row([dbc.Col(numberOfFolders, md=3),dbc.Col(usedCapacityPie, md=3)])
+graphRow1 = dbc.Row([dbc.Col(numberOfFolders, md=3),dbc.Col(usedCapacityPie, md=3),dbc.Col(usedAlgorithmCard, md=3)])
 
 
 app.layout = html.Div([html.Br(),graphRow0,graphRow1, html.Br(), dcc.Interval(
@@ -364,7 +391,7 @@ def update_freeCapacity(n):
 
             }],
         "layout": {
-            "title": dict(text="number of folders",
+            "title": dict(text="free capacity",
                           font=dict(
                               size=20,
                               color='white')),
@@ -416,6 +443,17 @@ def update_freeCapacityPieChart(n):
                
             }
         }
+
+
+@app.callback(Output('currentDiv', 'children'),
+              [Input('interval-component', 'n_intervals')])
+def update_CurrentAlgo(n):
+    conn = create_connection()
+    usedAlgorithm1 = getUsedAlgorithm(conn)
+
+    return html.H2(usedAlgorithm1, className="card-subtitle", id='Current')
+
+
 
 if __name__ == '__main__':
     app.run_server(debug=True)
