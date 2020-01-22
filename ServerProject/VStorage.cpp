@@ -73,11 +73,15 @@ void VStorage::AllocateFiles(std::vector<std::pair<VFile&, FileUploadInfo&>> fil
 	totalFilesUploaded += files.size();
 
 	ConsoleOutput() << "[INFO] Total files uploaded so far " << totalFilesUploaded << "\n";
+	IBPAlgorithm* algo = Allocator::GetStorageAlgorithmBySeries(containers, algosPtr);
+	/*
+	removed for adding longest series code
 	IBPAlgorithm* algo = Allocator::GetStorageAlgorithm(algosPtr, 
 														totalFilesUploaded, 
 														input_files_weight_distribution,
 														max_items_in_container,
 														max_container_size);
+														*/
 	db::Database::Instance().setCurrentAlgorithm(algo->GetName());
 	
 	for(auto& pair : files){

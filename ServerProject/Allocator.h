@@ -18,5 +18,8 @@ public:
 		size_t max_input_weight,
 		size_t max_items_in_bin,
 		size_t max_bin_size);
+	static IBPAlgorithm* GetStorageAlgorithmBySeries(
+		std::vector<VContainer> &containers,
+		std::vector<IBPAlgorithm*> algorithms);
 };
 

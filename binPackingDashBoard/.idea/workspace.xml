@@ -2,6 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c6dd5a66-f4bb-4e72-86cc-8bdbdc364e61" name="Default Changelist" comment="dashboard added,work on pycharm">
+      <change beforePath="$PROJECT_DIR$/../ServerProject/Allocator.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../ServerProject/Allocator.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ServerProject/Allocator.h" beforeDir="false" afterPath="$PROJECT_DIR$/../ServerProject/Allocator.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ServerProject/VStorage.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../ServerProject/VStorage.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ServerProject/binPacking.db" beforeDir="false" afterPath="$PROJECT_DIR$/../ServerProject/binPacking.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ServerProject/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../ServerProject/main.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/venv/Scripts/main" beforeDir="false" afterPath="$PROJECT_DIR$/venv/Scripts/main" afterDir="false" />
     </list>
