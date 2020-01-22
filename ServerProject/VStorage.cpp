@@ -72,7 +72,6 @@ void VStorage::AllocateFiles(std::vector<std::pair<VFile&, FileUploadInfo&>> fil
 	}
 	totalFilesUploaded += files.size();
 
-	//IBPAlgorithm* algo = Allocator::GetStorageAlgorithm(algosPtr, files.size());
 	ConsoleOutput() << "[INFO] Total files uploaded so far " << totalFilesUploaded << "\n";
 	IBPAlgorithm* algo = Allocator::GetStorageAlgorithm(algosPtr, 
 														totalFilesUploaded, 
@@ -82,16 +81,6 @@ void VStorage::AllocateFiles(std::vector<std::pair<VFile&, FileUploadInfo&>> fil
 	db::Database::Instance().setCurrentAlgorithm(algo->GetName());
 	
 	for(auto& pair : files){
-		std::vector<uint64_t> containersFreeCapacity;
-		for (VContainer& cont : containers) {
-			if (cont.GetTotalCapacity() >= pair.second.fileSize)
-				containersFreeCapacity.push_back(cont.GetFreeCapacity());
-		}
-		if (containersFreeCapacity.size() == 0){
-			ConsoleOutput() << "[INFO] File size cannot be stored " 
-				<< "[" << pair.second.fileName << "," << pair.second.fileSize << "]\n";
-		}
-
 		int contIndex = algo->RunAlgorithm(pair.second.fileSize, containers);
 
 		VContainer* parentCont;
@@ -108,8 +97,7 @@ void VStorage::AllocateFiles(std::vector<std::pair<VFile&, FileUploadInfo&>> fil
 		pair.first.fileName = pair.second.fileName;
 		pair.first.fileSize = pair.second.fileSize;
 		pair.first.SetParent(parentCont);
-		//parentCont->files.push_back(std::move(pair.first));
-		//parentCont->UseCapacity(pair.first.fileSize);
+
 		ConsoleOutput() << "[INFO] Stored " << pair.first << " in container " << parentCont->GetPrint() << "\n";
 	}
 }

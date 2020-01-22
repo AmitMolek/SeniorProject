@@ -1,6 +1,7 @@
 #include "SocketHelper.h"
 #include "BaseServer.h"
 #include "VStorage.h"
+#include "ConsoleOutput.h"
 
 #include "IBPAlgorithm.h"
 #include "FirstFit.h"
@@ -25,9 +26,9 @@ int main() {
 	NextFit nf;
 	BestFit bf;
 	
-	size_t files_distribution = 10;
-	size_t container_size = 10;
-	size_t max_items_in_container = 10;
+	size_t files_distribution = 5;
+	size_t container_size = 5;
+	size_t max_items_in_container = 5;
 	
 	VStorage virtualStorage(virtualStorageRoot, { &ff, &nf }, true);
 	virtualStorage.SetSystemParams(files_distribution, 
@@ -37,30 +38,6 @@ int main() {
 	
 	int i;
 	std::cin >> i;
-	std::cout << "[INFO] Main thread finished\n";
+	std::cout << "[INFO] Main thread finished\n" << std::endl;
 
-	//fs::path inputPath = fs::current_path();
-	//inputPath /= "TestFiles";
-	//inputPath /= "Input";
-	//inputPath /= "test.jpg";
-
-	//fs::path outputPath = fs::current_path();
-	//outputPath /= "TestFiles";
-	//outputPath /= "test.jpg";
-
-	//std::cout << "Input path: " << inputPath << std::endl;
-	//std::cout << "Output path: " << outputPath << std::endl;
-
-	//std::ifstream input(inputPath, std::ios::binary);
-	//std::ofstream output(outputPath, std::ios::binary);
-
-	////std::vector<unsigned char> buffer(std::istreambuf_iterator<char>(input), {});
-	//output << input.rdbuf();
-
-	//output.close();
-	//output.flush();
-	//input.close();
-
-	//int i;
-	//std::cin >> i;
 }
