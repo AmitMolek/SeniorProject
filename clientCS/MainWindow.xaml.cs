@@ -173,10 +173,14 @@ namespace clientCS {
                                             foreach (string s in tuples) {
                                                 string[] filesColInfo = s.Split('^');
                                                 if (filesColInfo.Length > 1) {
-                                                    string fileName = (filesColInfo[0].Split(':')[1]);
-                                                    string fileSize = (filesColInfo[1].Split(':')[1]);
-                                                    filesList.Add(new FilesViewItem { fileName = fileName, fileSize = fileSize, isChecked = false, checkBoxId = id });
-                                                    id++;
+                                                    if (filesColInfo[0].Split(':').Length > 1)
+                                                    {
+                                                        string fileName = (filesColInfo[0].Split(':')[1]);
+                                                        string fileSize = (filesColInfo[1].Split(':')[1]);
+
+                                                        filesList.Add(new FilesViewItem { fileName = fileName, fileSize = fileSize, isChecked = false, checkBoxId = id });
+                                                        id++;
+                                                    }
                                                 }
                                             }
                                         }
