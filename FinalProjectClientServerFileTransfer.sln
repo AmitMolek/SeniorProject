@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29201.188
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ClientProject", "ClientProject\ClientProject.vcxproj", "{531D0ECD-DA9F-43EF-A4BF-4F0CC03585D2}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ServerProject", "ServerProject\ServerProject.vcxproj", "{65E48F25-49D6-49B2-AAF2-7BC3F5A5B0A1}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ClientServerSharedCode", "ClientServerSharedCode\ClientServerSharedCode.vcxitems", "{551D5604-49ED-4CF9-9FE5-FD9DA69F66CA}"
@@ -13,7 +11,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "clientCS", "clientCS\client
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		ClientServerSharedCode\ClientServerSharedCode.vcxitems*{531d0ecd-da9f-43ef-a4bf-4f0cc03585d2}*SharedItemsImports = 4
 		ClientServerSharedCode\ClientServerSharedCode.vcxitems*{551d5604-49ed-4cf9-9fe5-fd9da69f66ca}*SharedItemsImports = 9
 		ClientServerSharedCode\ClientServerSharedCode.vcxitems*{65e48f25-49d6-49b2-aaf2-7bc3f5a5b0a1}*SharedItemsImports = 4
 	EndGlobalSection
@@ -26,16 +23,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{531D0ECD-DA9F-43EF-A4BF-4F0CC03585D2}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{531D0ECD-DA9F-43EF-A4BF-4F0CC03585D2}.Debug|x64.ActiveCfg = Debug|x64
-		{531D0ECD-DA9F-43EF-A4BF-4F0CC03585D2}.Debug|x64.Build.0 = Debug|x64
-		{531D0ECD-DA9F-43EF-A4BF-4F0CC03585D2}.Debug|x86.ActiveCfg = Debug|Win32
-		{531D0ECD-DA9F-43EF-A4BF-4F0CC03585D2}.Debug|x86.Build.0 = Debug|Win32
-		{531D0ECD-DA9F-43EF-A4BF-4F0CC03585D2}.Release|Any CPU.ActiveCfg = Release|Win32
-		{531D0ECD-DA9F-43EF-A4BF-4F0CC03585D2}.Release|x64.ActiveCfg = Release|x64
-		{531D0ECD-DA9F-43EF-A4BF-4F0CC03585D2}.Release|x64.Build.0 = Release|x64
-		{531D0ECD-DA9F-43EF-A4BF-4F0CC03585D2}.Release|x86.ActiveCfg = Release|Win32
-		{531D0ECD-DA9F-43EF-A4BF-4F0CC03585D2}.Release|x86.Build.0 = Release|Win32
 		{65E48F25-49D6-49B2-AAF2-7BC3F5A5B0A1}.Debug|Any CPU.ActiveCfg = Debug|Win32
 		{65E48F25-49D6-49B2-AAF2-7BC3F5A5B0A1}.Debug|Any CPU.Build.0 = Debug|Win32
 		{65E48F25-49D6-49B2-AAF2-7BC3F5A5B0A1}.Debug|x64.ActiveCfg = Debug|x64
